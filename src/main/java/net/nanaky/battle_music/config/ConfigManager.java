@@ -12,7 +12,6 @@ public class ConfigManager {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH =
             FabricLoader.getInstance().getConfigDir().resolve("battle_music.json");
-
     public static BattleMusicConfig INSTANCE = new BattleMusicConfig();
 
     public static void load() {
@@ -36,12 +35,16 @@ public class ConfigManager {
                 INSTANCE.banditMode             = loaded.banditMode;
                 INSTANCE.netherMode             = loaded.netherMode;
                 INSTANCE.raidMode               = loaded.raidMode;
-                INSTANCE.bossMode               = loaded.bossMode;
+                INSTANCE.wardenMode             = loaded.wardenMode;
+                INSTANCE.witherMode             = loaded.witherMode;
+                INSTANCE.dragonMode             = loaded.dragonMode;
                 INSTANCE.defaultVolume          = loaded.defaultVolume;
                 INSTANCE.banditVolume           = loaded.banditVolume;
                 INSTANCE.netherVolume           = loaded.netherVolume;
                 INSTANCE.raidVolume             = loaded.raidVolume;
-                INSTANCE.bossVolume             = loaded.bossVolume;
+                INSTANCE.wardenVolume           = loaded.wardenVolume;
+                INSTANCE.witherVolume           = loaded.witherVolume;
+                INSTANCE.dragonVolume           = loaded.dragonVolume;
                 INSTANCE.underwaterPitch        = loaded.underwaterPitch;
                 INSTANCE.useFade                = loaded.useFade;
                 INSTANCE.fadeOutTicks           = loaded.fadeOutTicks;

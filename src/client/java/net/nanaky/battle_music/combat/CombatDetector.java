@@ -38,7 +38,6 @@ public class CombatDetector {
     private static final TagKey<EntityType<?>> TAG_FAR     = tag("long_range");
     private static final TagKey<EntityType<?>> TAG_VARIANT = tag("variants");
     private static final TagKey<EntityType<?>> TAG_BANDIT  = tag("bandits");
-    private static final TagKey<EntityType<?>> TAG_BOSS    = tag("bosses");
 
     private static TagKey<EntityType<?>> tag(String path) {
         return TagKey.create(Registries.ENTITY_TYPE,
@@ -102,8 +101,14 @@ public class CombatDetector {
         LocalPlayer player      = mc.player;
         boolean     reqTarget   = cfg.isRequireTargetingPlayer();
 
-        if (hasThreat(player, level, cfg.getBossRadius(), false, CombatDetector::isBoss))
-            states.add(CombatState.BOSS);
+        if (hasThreat(player, level, cfg.getBossRadius(), false, mob -> mob instanceof EnderDragon))
+            states.add(CombatState.ENDER_DRAGON);
+
+        if (hasThreat(player, level, cfg.getBossRadius(), false, mob -> mob instanceof WitherBoss))
+            states.add(CombatState.WITHER);
+
+        if (hasThreat(player, level, cfg.getBossRadius(), false, mob -> mob instanceof Warden))
+            states.add(CombatState.WARDEN);
 
         if (isRaidActive(mc))
             states.add(CombatState.RAID);
@@ -152,11 +157,6 @@ public class CombatDetector {
         return isFar(mob) || isBandit(mob);
     }
 
-    private static boolean isBoss(Mob mob) {
-        if (mob.getType().builtInRegistryHolder().is(TAG_BOSS)) return true;
-        return mob instanceof WitherBoss || mob instanceof EnderDragon || mob instanceof Warden;
-    }
-
     private static boolean isBandit(Mob mob) {
         if (mob.getType().builtInRegistryHolder().is(TAG_BANDIT)) return true;
         return mob instanceof Pillager || mob instanceof Vindicator || mob instanceof Ravager
@@ -178,7 +178,8 @@ public class CombatDetector {
 
     private static boolean isNormal(Mob mob) {
         if (mob.getType().builtInRegistryHolder().is(TAG_NORMAL)) return true;
-        if (isBoss(mob) || isBandit(mob) || isVariant(mob) || isFar(mob)) return false;
+        if (mob instanceof EnderDragon || mob instanceof WitherBoss || mob instanceof Warden
+                || isBandit(mob) || isVariant(mob) || isFar(mob)) return false;
         return mob instanceof Zombie || mob instanceof Drowned
                 || mob instanceof WitherSkeleton || mob instanceof Skeleton
                 || mob instanceof Spider || mob instanceof MagmaCube

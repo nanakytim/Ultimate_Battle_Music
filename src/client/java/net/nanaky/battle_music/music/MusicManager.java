@@ -147,7 +147,9 @@ public class MusicManager {
     private static CombatState resolveAudibleState(Set<CombatState> states, BattleMusicConfig cfg) {
         if (states.isEmpty()) return CombatState.NONE;
 
-        if (states.contains(CombatState.BOSS))             return CombatState.BOSS;
+        if (states.contains(CombatState.ENDER_DRAGON))     return CombatState.ENDER_DRAGON;
+        if (states.contains(CombatState.WITHER))           return CombatState.WITHER;
+        if (states.contains(CombatState.WARDEN))           return CombatState.WARDEN;
         if (states.contains(CombatState.RAID))             return CombatState.RAID;
         if (states.contains(CombatState.OVERWORLD_BANDIT)) return CombatState.OVERWORLD_BANDIT;
         if (states.contains(CombatState.NETHER))           return CombatState.NETHER;
@@ -167,29 +169,39 @@ public class MusicManager {
     private static SoundEvent resolveSound(CombatState state, BattleMusicConfig cfg) {
         return switch (state) {
             case OVERWORLD_VARIANT -> switch (cfg.getVariantMode()) {
-                case ON     -> ModSounds.BATTLE_VARIANT;
+                case ON       -> ModSounds.BATTLE_VARIANT;
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
-                case OFF    -> null;
+                case OFF      -> null;
             };
             case OVERWORLD_BANDIT -> switch (cfg.getBanditMode()) {
-                case ON     -> ModSounds.BATTLE_BANDITS;
+                case ON       -> ModSounds.BATTLE_BANDITS;
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
-                case OFF    -> null;
+                case OFF      -> null;
             };
             case NETHER -> switch (cfg.getNetherMode()) {
-                case ON     -> ModSounds.BATTLE_NETHER;
+                case ON       -> ModSounds.BATTLE_NETHER;
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
-                case OFF    -> null;
+                case OFF      -> null;
             };
-            case BOSS -> switch (cfg.getRaidMode()) {
-                case ON     -> ModSounds.BATTLE_RAID;
+            case RAID -> switch (cfg.getRaidMode()) {
+                case ON       -> ModSounds.BATTLE_RAID;
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
-                case OFF    -> null;
+                case OFF      -> null;
             };
-            case RAID -> switch (cfg.getBossMode()) {
-                case ON     -> ModSounds.BATTLE_BOSS;
+            case WARDEN -> switch (cfg.getWardenMode()) {
+                case ON       -> ModSounds.BATTLE_WARDEN;
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
-                case OFF    -> null;
+                case OFF      -> null;
+            };
+            case WITHER -> switch (cfg.getWitherMode()) {
+                case ON       -> ModSounds.BATTLE_WITHER;
+                case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                case OFF      -> null;
+            };
+            case ENDER_DRAGON -> switch (cfg.getDragonMode()) {
+                case ON       -> ModSounds.BATTLE_DRAGON;
+                case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                case OFF      -> null;
             };
             case OVERWORLD_NORMAL -> ModSounds.BATTLE_MUSIC;
             default               -> null;
@@ -198,7 +210,9 @@ public class MusicManager {
 
     private static float resolveVolume(CombatState state, BattleMusicConfig cfg) {
         return switch (state) {
-            case BOSS             -> cfg.getBossVolume();
+            case ENDER_DRAGON     -> cfg.getDragonVolume();
+            case WITHER           -> cfg.getWitherVolume();
+            case WARDEN           -> cfg.getWardenVolume();
             case RAID             -> cfg.getRaidVolume();
             case NETHER           -> cfg.getNetherVolume();
             case OVERWORLD_BANDIT -> cfg.getBanditVolume();

@@ -14,12 +14,11 @@ import net.nanaky.battle_music.music.MusicManager;
 
 public class ModMenuIntegration implements ModMenuApi {
 
-    // Human-readable labels shown in the dropdown for each MusicMode value
     private static Component modeLabel(MusicMode mode) {
         return switch (mode) {
-            case ON     -> Component.literal("ON (unique track)");
+            case ON       -> Component.literal("ON (unique track)");
             case FALLBACK -> Component.literal("NORMAL (fallback)");
-            case OFF    -> Component.literal("OFF (no music)");
+            case OFF      -> Component.literal("OFF (no music)");
         };
     }
 
@@ -95,17 +94,6 @@ public class ModMenuIntegration implements ModMenuApi {
                 .setSaveConsumer(v -> cfg.raidMode = v)
                 .build());
 
-            music.addEntry(eb.startEnumSelector(
-                    Component.literal("Boss Music"),
-                    MusicMode.class,
-                    cfg.bossMode)
-                .setDefaultValue(def.bossMode)
-                .setTooltip(Component.literal(
-                    "ON = unique boss track | NORMAL = fallback to default | OFF = silence during boss fights"))
-                .setEnumNameProvider(e -> modeLabel((MusicMode) e))
-                .setSaveConsumer(v -> cfg.bossMode = v)
-                .build());
-
             ConfigCategory detection = builder.getOrCreateCategory(Component.literal("Detection Type"));
 
             detection.addEntry(eb.startBooleanToggle(
@@ -162,6 +150,59 @@ public class ModMenuIntegration implements ModMenuApi {
                 .setSaveConsumer(v -> cfg.bossRadius = v)
                 .build());
 
+            ConfigCategory bosses = builder.getOrCreateCategory(Component.literal("Bosses"));
+
+            bosses.addEntry(eb.startEnumSelector(
+                    Component.literal("Warden Music"),
+                    MusicMode.class,
+                    cfg.wardenMode)
+                .setDefaultValue(def.wardenMode)
+                .setTooltip(Component.literal(
+                    "ON = unique warden track | NORMAL = fallback to default | OFF = silence for warden"))
+                .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setSaveConsumer(v -> cfg.wardenMode = v)
+                .build());
+
+            bosses.addEntry(eb.startIntSlider(
+                    Component.literal("Warden Volume (%)"), (int)(cfg.wardenVolume * 100), 0, 100)
+                .setDefaultValue((int)(def.wardenVolume * 100))
+                .setSaveConsumer(v -> cfg.wardenVolume = v / 100f)
+                .build());
+
+            bosses.addEntry(eb.startEnumSelector(
+                    Component.literal("Wither Music"),
+                    MusicMode.class,
+                    cfg.witherMode)
+                .setDefaultValue(def.witherMode)
+                .setTooltip(Component.literal(
+                    "ON = unique wither track | NORMAL = fallback to default | OFF = silence for wither"))
+                .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setSaveConsumer(v -> cfg.witherMode = v)
+                .build());
+
+            bosses.addEntry(eb.startIntSlider(
+                    Component.literal("Wither Volume (%)"), (int)(cfg.witherVolume * 100), 0, 100)
+                .setDefaultValue((int)(def.witherVolume * 100))
+                .setSaveConsumer(v -> cfg.witherVolume = v / 100f)
+                .build());
+
+            bosses.addEntry(eb.startEnumSelector(
+                    Component.literal("Ender Dragon Music"),
+                    MusicMode.class,
+                    cfg.dragonMode)
+                .setDefaultValue(def.dragonMode)
+                .setTooltip(Component.literal(
+                    "ON = unique dragon track | NORMAL = fallback to default | OFF = silence for dragon"))
+                .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setSaveConsumer(v -> cfg.dragonMode = v)
+                .build());
+
+            bosses.addEntry(eb.startIntSlider(
+                    Component.literal("Ender Dragon Volume (%)"), (int)(cfg.dragonVolume * 100), 0, 100)
+                .setDefaultValue((int)(def.dragonVolume * 100))
+                .setSaveConsumer(v -> cfg.dragonVolume = v / 100f)
+                .build());
+
             ConfigCategory volume = builder.getOrCreateCategory(Component.literal("Volume"));
 
             volume.addEntry(eb.startIntSlider(
@@ -190,19 +231,13 @@ public class ModMenuIntegration implements ModMenuApi {
                 .build());
 
             volume.addEntry(eb.startIntSlider(
-                    Component.literal("Boss Volume (%)"), (int)(cfg.bossVolume * 100), 0, 100)
-                .setDefaultValue((int)(def.bossVolume * 100))
-                .setSaveConsumer(v -> cfg.bossVolume = v / 100f)
-                .build());
-
-            volume.addEntry(eb.startIntSlider(
                     Component.literal("Fluid Pitch (%)"), (int)(cfg.underwaterPitch * 100), 50, 200)
                 .setDefaultValue((int)(def.underwaterPitch * 100))
                 .setTooltip(Component.literal("Pitch when inside Water or Lava. 75 = lower/deeper tone."))
                 .setSaveConsumer(v -> cfg.underwaterPitch = v / 100f)
                 .build());
 
-            ConfigCategory fade = builder.getOrCreateCategory(Component.literal("Fade & Ghost"));
+            ConfigCategory fade = builder.getOrCreateCategory(Component.literal("Fade"));
 
             fade.addEntry(eb.startBooleanToggle(
                     Component.literal("Use Fade"), cfg.useFade)

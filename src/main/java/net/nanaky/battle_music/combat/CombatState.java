@@ -7,7 +7,9 @@ public enum CombatState {
     NETHER(3),
     OVERWORLD_BANDIT(4),
     RAID(5),
-    BOSS(6);
+    WARDEN(6),
+    WITHER(7),
+    ENDER_DRAGON(8);
 
     private final int priority;
     CombatState(int priority) { this.priority = priority; }
