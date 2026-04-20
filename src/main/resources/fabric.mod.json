@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "battle_music",
+	"version": "${version}",
+	"name": "Battle Music",
+	"description": "Plays music during combat",
+	"authors": [
+		"Nanaky"
+	],
+	"contact": {
+		"homepage": "https://github.com/nanakytim",
+		"sources": "https://github.com/nanakytim/battle_music"
+	},
+	"license": "GPL-3.0",
+	"icon": "icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": ["net.nanaky.battle_music.BattleMusicMod"],
+    	"client": ["net.nanaky.battle_music.BattleMusicClient"],
+    	"modmenu": ["net.nanaky.battle_music.ModMenuIntegration"]
+	},
+	"mixins": [
+	],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~26.1",
+		"java": ">=25",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"modmenu": "*",
+		"cloth-config": "*"
+	}
+}

@@ -1,0 +1,176 @@
+package net.nanaky.battle_music.music;
+
+import net.nanaky.battle_music.combat.CombatState;
+import net.nanaky.battle_music.config.BattleMusicConfig;
+import net.nanaky.battle_music.config.ConfigManager;
+import net.nanaky.battle_music.registry.ModSounds;
+import net.minecraft.client.Minecraft;
+import net.minecraft.sounds.SoundEvent;
+
+import java.util.*;
+
+public class MusicManager {
+
+    private static final Map<CombatState, LoopingSoundInstance> managedSounds =
+            new EnumMap<>(CombatState.class);
+
+    private static Set<CombatState> activeStates = EnumSet.noneOf(CombatState.class);
+    private static CombatState currentAudibleState = CombatState.NONE;
+    private static int     fluidPitchDelayTick = 0;
+    private static boolean wasInFluid          = false;
+    private static final int FLUID_PITCH_DELAY = 50;
+
+    public static void tick() {
+        managedSounds.entrySet().removeIf(e -> e.getValue().isStopped());
+
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null) {
+            BattleMusicConfig cfg = ConfigManager.getInstance();
+            boolean inFluid       = mc.player.isUnderWater()
+                                 || mc.player.isEyeInFluid(net.minecraft.tags.FluidTags.LAVA);
+
+            if (inFluid != wasInFluid) {
+                fluidPitchDelayTick = 0;
+                wasInFluid = inFluid;
+            } else if (fluidPitchDelayTick < FLUID_PITCH_DELAY) {
+                fluidPitchDelayTick++;
+            }
+
+            float targetPitch = (fluidPitchDelayTick >= FLUID_PITCH_DELAY)
+                    ? (inFluid ? cfg.getUnderwaterPitch() : 1.0f)
+                    : (wasInFluid ? cfg.getUnderwaterPitch() : 1.0f);
+
+            for (LoopingSoundInstance sound : managedSounds.values()) {
+                if (!sound.isStopped()) {
+                    sound.setTargetPitch(targetPitch, false);
+                }
+            }
+        }
+    }
+
+    public static void onConfigChanged() {
+        BattleMusicConfig cfg = ConfigManager.getInstance();
+        if (!cfg.isEnableMusic()) {
+            stopAll();
+            return;
+        }
+        if (!activeStates.isEmpty()) {
+            onCombatStatesChanged(activeStates);
+        }
+    }
+
+    public static void onCombatStatesChanged(Set<CombatState> newStates) {
+        BattleMusicConfig cfg     = ConfigManager.getInstance();
+        boolean           useFade = cfg.isUseFade();
+
+        if (!cfg.isEnableMusic()) {
+            stopAll();
+            return;
+        }
+
+        Set<CombatState> removed = EnumSet.noneOf(CombatState.class);
+        if (!activeStates.isEmpty()) removed.addAll(activeStates);
+        removed.removeAll(newStates);
+
+        Set<CombatState> added = newStates.isEmpty()
+                ? EnumSet.noneOf(CombatState.class)
+                : EnumSet.copyOf(newStates);
+        added.removeAll(activeStates);
+
+        CombatState desiredAudible = resolveAudibleState(newStates, cfg);
+
+        for (CombatState state : removed) {
+            LoopingSoundInstance sound = managedSounds.get(state);
+            if (sound != null) sound.beginFadeOut(useFade);
+        }
+
+        for (CombatState state : added) {
+            LoopingSoundInstance existing = managedSounds.get(state);
+            boolean willBeAudible         = (state == desiredAudible);
+
+            if (existing != null && existing.isRevivable()) {
+                existing.revive(useFade && willBeAudible);
+                if (willBeAudible) existing.activate(useFade);
+                else               existing.suppress(false);
+            } else if (existing == null || existing.isStopped()) {
+                SoundEvent sound = resolveSound(state, cfg);
+                if (sound != null) {
+                    LoopingSoundInstance instance = new LoopingSoundInstance(
+                            sound,
+                            resolveVolume(state, cfg),
+                            1.0f,
+                            cfg.getReviveFadeInTicks(),
+                            cfg.getFadeOutTicks(),
+                            cfg.getGhostDurationTicks()
+                    );
+                    if (!willBeAudible) instance.suppress(false);
+                    managedSounds.put(state, instance);
+                    Minecraft.getInstance().getSoundManager().play(instance);
+                }
+            }
+        }
+
+        activeStates        = newStates.isEmpty() ? EnumSet.noneOf(CombatState.class) : EnumSet.copyOf(newStates);
+        currentAudibleState = desiredAudible;
+
+        for (CombatState state : activeStates) {
+            LoopingSoundInstance sound = managedSounds.get(state);
+            if (sound != null && !sound.isStopped()) {
+                if (state == currentAudibleState) sound.activate(useFade);
+                else                              sound.suppress(useFade);
+            }
+        }
+
+        if (!activeStates.isEmpty()) {
+            Minecraft.getInstance().getMusicManager().stopPlaying();
+        }
+    }
+
+    public static void stopAll() {
+        managedSounds.values().forEach(s -> s.beginFadeOut(false));
+        managedSounds.clear();
+        activeStates        = EnumSet.noneOf(CombatState.class);
+        currentAudibleState = CombatState.NONE;
+    }
+
+    private static CombatState resolveAudibleState(Set<CombatState> states, BattleMusicConfig cfg) {
+        if (states.isEmpty()) return CombatState.NONE;
+
+        if (states.contains(CombatState.BOSS))             return CombatState.BOSS;
+        if (states.contains(CombatState.OVERWORLD_BANDIT)) return CombatState.OVERWORLD_BANDIT;
+        if (states.contains(CombatState.NETHER))           return CombatState.NETHER;
+
+        boolean hasVariant = states.contains(CombatState.OVERWORLD_VARIANT);
+        boolean hasNormal  = states.contains(CombatState.OVERWORLD_NORMAL);
+
+        if (hasVariant || hasNormal) {
+            if ((currentAudibleState == CombatState.OVERWORLD_VARIANT && hasVariant) ||
+                (currentAudibleState == CombatState.OVERWORLD_NORMAL  && hasNormal)) {
+                return currentAudibleState;
+            }
+            return hasVariant ? CombatState.OVERWORLD_VARIANT : CombatState.OVERWORLD_NORMAL;
+        }
+
+        return CombatState.NONE;
+    }
+
+    private static SoundEvent resolveSound(CombatState state, BattleMusicConfig cfg) {
+        return switch (state) {
+            case OVERWORLD_VARIANT -> cfg.isEnableVariant() ? ModSounds.BATTLE_VARIANT : ModSounds.BATTLE_MUSIC;
+            case OVERWORLD_BANDIT  -> cfg.isEnableBandit()  ? ModSounds.BATTLE_BANDITS : ModSounds.BATTLE_MUSIC;
+            case NETHER            -> cfg.isEnableNether()  ? ModSounds.BATTLE_NETHER  : ModSounds.BATTLE_MUSIC;
+            case BOSS              -> cfg.isEnableBoss()    ? ModSounds.BATTLE_BOSS    : ModSounds.BATTLE_MUSIC;
+            case OVERWORLD_NORMAL  -> ModSounds.BATTLE_MUSIC;
+            default                -> null;
+        };
+    }
+
+    private static float resolveVolume(CombatState state, BattleMusicConfig cfg) {
+        return switch (state) {
+            case BOSS             -> cfg.getBossVolume();
+            case NETHER           -> cfg.getNetherVolume();
+            case OVERWORLD_BANDIT -> cfg.getBanditVolume();
+            default               -> cfg.getDefaultVolume();
+        };
+    }
+}
