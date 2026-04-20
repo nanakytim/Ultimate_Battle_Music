@@ -6,7 +6,8 @@ public enum CombatState {
     OVERWORLD_VARIANT(2),
     NETHER(3),
     OVERWORLD_BANDIT(4),
-    BOSS(5);
+    RAID(5),
+    BOSS(6);
 
     private final int priority;
     CombatState(int priority) { this.priority = priority; }

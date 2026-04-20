@@ -9,9 +9,19 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.network.chat.Component;
 import net.nanaky.battle_music.config.BattleMusicConfig;
 import net.nanaky.battle_music.config.ConfigManager;
+import net.nanaky.battle_music.config.MusicMode;
 import net.nanaky.battle_music.music.MusicManager;
 
 public class ModMenuIntegration implements ModMenuApi {
+
+    // Human-readable labels shown in the dropdown for each MusicMode value
+    private static Component modeLabel(MusicMode mode) {
+        return switch (mode) {
+            case ON     -> Component.literal("ON (unique track)");
+            case FALLBACK -> Component.literal("NORMAL (fallback)");
+            case OFF    -> Component.literal("OFF (no music)");
+        };
+    }
 
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
@@ -41,32 +51,59 @@ public class ModMenuIntegration implements ModMenuApi {
                 .setSaveConsumer(v -> cfg.enableMusic = v)
                 .build());
 
-            music.addEntry(eb.startBooleanToggle(
-                    Component.literal("Enable Variant Music"), cfg.enableVariant)
-                .setDefaultValue(def.enableVariant)
-                .setTooltip(Component.literal("Unique music for variant mobs. Falls back to default battle music if off."))
-                .setSaveConsumer(v -> cfg.enableVariant = v)
+            music.addEntry(eb.startEnumSelector(
+                    Component.literal("Variant Music"),
+                    MusicMode.class,
+                    cfg.variantMode)
+                .setDefaultValue(def.variantMode)
+                .setTooltip(Component.literal(
+                    "ON = unique variant track | NORMAL = fallback to default | OFF = silence for variants"))
+                .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setSaveConsumer(v -> cfg.variantMode = v)
                 .build());
 
-            music.addEntry(eb.startBooleanToggle(
-                    Component.literal("Enable Illager Music"), cfg.enableBandit)
-                .setDefaultValue(def.enableBandit)
-                .setTooltip(Component.literal("Unique music for illagers/bandits. Falls back to default battle music if off."))
-                .setSaveConsumer(v -> cfg.enableBandit = v)
+            music.addEntry(eb.startEnumSelector(
+                    Component.literal("Illager Music"),
+                    MusicMode.class,
+                    cfg.banditMode)
+                .setDefaultValue(def.banditMode)
+                .setTooltip(Component.literal(
+                    "ON = unique illager track | NORMAL = fallback to default | OFF = silence for illagers"))
+                .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setSaveConsumer(v -> cfg.banditMode = v)
                 .build());
 
-            music.addEntry(eb.startBooleanToggle(
-                    Component.literal("Enable Nether Music"), cfg.enableNether)
-                .setDefaultValue(def.enableNether)
-                .setTooltip(Component.literal("Unique music for nether combat. Falls back to default battle music if off."))
-                .setSaveConsumer(v -> cfg.enableNether = v)
+            music.addEntry(eb.startEnumSelector(
+                    Component.literal("Nether Music"),
+                    MusicMode.class,
+                    cfg.netherMode)
+                .setDefaultValue(def.netherMode)
+                .setTooltip(Component.literal(
+                    "ON = unique nether track | NORMAL = fallback to default | OFF = silence in nether combat"))
+                .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setSaveConsumer(v -> cfg.netherMode = v)
                 .build());
 
-            music.addEntry(eb.startBooleanToggle(
-                    Component.literal("Enable Boss Music"), cfg.enableBoss)
-                .setDefaultValue(def.enableBoss)
-                .setTooltip(Component.literal("Unique music for boss fights. Falls back to default battle music if off."))
-                .setSaveConsumer(v -> cfg.enableBoss = v)
+            music.addEntry(eb.startEnumSelector(
+                    Component.literal("Raid Music"),
+                    MusicMode.class,
+                    cfg.raidMode)
+                .setDefaultValue(def.raidMode)
+                .setTooltip(Component.literal(
+                    "ON = unique raid track | NORMAL = fallback to default | OFF = silence during raids"))
+                .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setSaveConsumer(v -> cfg.raidMode = v)
+                .build());
+
+            music.addEntry(eb.startEnumSelector(
+                    Component.literal("Boss Music"),
+                    MusicMode.class,
+                    cfg.bossMode)
+                .setDefaultValue(def.bossMode)
+                .setTooltip(Component.literal(
+                    "ON = unique boss track | NORMAL = fallback to default | OFF = silence during boss fights"))
+                .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setSaveConsumer(v -> cfg.bossMode = v)
                 .build());
 
             ConfigCategory detection = builder.getOrCreateCategory(Component.literal("Detection Type"));
@@ -100,7 +137,7 @@ public class ModMenuIntegration implements ModMenuApi {
                 .build());
 
             radii.addEntry(eb.startIntSlider(
-                    Component.literal("Bandit Mob Radius"), (int) cfg.banditRadius, 1, 64)
+                    Component.literal("Illager Radius"), (int) cfg.banditRadius, 1, 64)
                 .setDefaultValue((int) def.banditRadius)
                 .setSaveConsumer(v -> cfg.banditRadius = v)
                 .build());
@@ -119,15 +156,9 @@ public class ModMenuIntegration implements ModMenuApi {
                 .build());
 
             radii.addEntry(eb.startIntSlider(
-                    Component.literal("Nether Radius"), (int) cfg.netherRadius, 1, 64)
-                .setDefaultValue((int) def.netherRadius)
-                .setSaveConsumer(v -> cfg.netherRadius = v)
-                .build());
-
-            radii.addEntry(eb.startIntSlider(
                     Component.literal("Boss Radius"), (int) cfg.bossRadius, 1, 256)
                 .setDefaultValue((int) def.bossRadius)
-                .setTooltip(Component.literal("Detection radius for Wither, Warden, Ender Dragon."))
+                .setTooltip(Component.literal("Detection Radius for Wither, Warden, Ender Dragon."))
                 .setSaveConsumer(v -> cfg.bossRadius = v)
                 .build());
 
@@ -136,14 +167,20 @@ public class ModMenuIntegration implements ModMenuApi {
             volume.addEntry(eb.startIntSlider(
                     Component.literal("Default Volume (%)"), (int)(cfg.defaultVolume * 100), 0, 100)
                 .setDefaultValue((int)(def.defaultVolume * 100))
-                .setTooltip(Component.literal("Volume for overworld battle music."))
+                .setTooltip(Component.literal("Volume for Overworld Normal Battle Music."))
                 .setSaveConsumer(v -> cfg.defaultVolume = v / 100f)
                 .build());
 
             volume.addEntry(eb.startIntSlider(
-                    Component.literal("Bandit Volume (%)"), (int)(cfg.banditVolume * 100), 0, 100)
+                    Component.literal("Illager Volume (%)"), (int)(cfg.banditVolume * 100), 0, 100)
                 .setDefaultValue((int)(def.banditVolume * 100))
                 .setSaveConsumer(v -> cfg.banditVolume = v / 100f)
+                .build());
+
+            volume.addEntry(eb.startIntSlider(
+                    Component.literal("Raid Volume (%)"), (int)(cfg.raidVolume * 100), 0, 100)
+                .setDefaultValue((int)(def.raidVolume * 100))
+                .setSaveConsumer(v -> cfg.raidVolume = v / 100f)
                 .build());
 
             volume.addEntry(eb.startIntSlider(
@@ -161,7 +198,7 @@ public class ModMenuIntegration implements ModMenuApi {
             volume.addEntry(eb.startIntSlider(
                     Component.literal("Fluid Pitch (%)"), (int)(cfg.underwaterPitch * 100), 50, 200)
                 .setDefaultValue((int)(def.underwaterPitch * 100))
-                .setTooltip(Component.literal("Pitch when inside water or lava. 75 = lower/deeper tone."))
+                .setTooltip(Component.literal("Pitch when inside Water or Lava. 75 = lower/deeper tone."))
                 .setSaveConsumer(v -> cfg.underwaterPitch = v / 100f)
                 .build());
 

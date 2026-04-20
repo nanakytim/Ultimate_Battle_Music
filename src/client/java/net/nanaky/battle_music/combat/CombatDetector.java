@@ -45,6 +45,16 @@ public class CombatDetector {
                 Identifier.fromNamespaceAndPath("battle_music", path));
     }
 
+    private static boolean isRaidActive(Minecraft mc) {
+        if (mc.player == null || mc.level == null) return false;
+        AABB box = mc.player.getBoundingBox().inflate(128);
+        return !mc.level.getEntitiesOfClass(
+            net.minecraft.world.entity.raid.Raider.class,
+            box,
+            raider -> !raider.isDeadOrDying()
+        ).isEmpty();
+    }
+
     public static void tick() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null || mc.isPaused()) return;
@@ -95,11 +105,14 @@ public class CombatDetector {
         if (hasThreat(player, level, cfg.getBossRadius(), false, CombatDetector::isBoss))
             states.add(CombatState.BOSS);
 
+        if (isRaidActive(mc))
+            states.add(CombatState.RAID);
+
         if (level.dimension().equals(Level.NETHER)) {
             if (hasThreat(player, level, cfg.getBanditRadius(), reqTarget, CombatDetector::isBandit)
                 || hasThreat(player, level, cfg.getVariantRadius(), reqTarget, CombatDetector::isVariant)
                 || hasThreat(player, level, cfg.getNormalRadius(), reqTarget, CombatDetector::isNormal)
-                || hasThreat(player, level, cfg.getFarRadius(), false, CombatDetector::isFar)   // ranged: radius only
+                || hasThreat(player, level, cfg.getFarRadius(), false, CombatDetector::isFar)
                 || hasThreat(player, level, cfg.getCreeperRadius(), reqTarget, mob -> mob instanceof Creeper))
                 states.add(CombatState.NETHER);
             return states;
@@ -132,7 +145,11 @@ public class CombatDetector {
     }
 
     private static boolean isThreateningPlayer(Mob mob) {
-        return mob.isAggressive();
+        if (mob.isAggressive()) return true;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return false;
+        if (mc.player.equals(mob.getTarget())) return true;
+        return isFar(mob) || isBandit(mob);
     }
 
     private static boolean isBoss(Mob mob) {

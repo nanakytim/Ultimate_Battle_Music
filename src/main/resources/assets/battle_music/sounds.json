@@ -3,5 +3,6 @@
   "battle_variant": { "sounds": [{"name": "battle_music:battle_variant",  "stream": true}], "category": "music" },
   "battle_bandits": { "sounds": [{"name": "battle_music:battle_bandits",  "stream": true}], "category": "music" },
   "battle_nether":  { "sounds": [{"name": "battle_music:battle_nether",   "stream": true}], "category": "music" },
+  "battle_raid":    { "sounds": [{"name": "battle_music:battle_raid",     "stream": true}], "category": "music" },
   "battle_boss":    { "sounds": [{"name": "battle_music:battle_boss",     "stream": true}], "category": "music" }
 }

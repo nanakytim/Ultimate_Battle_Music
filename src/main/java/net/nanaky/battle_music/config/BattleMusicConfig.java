@@ -17,19 +17,20 @@ public class BattleMusicConfig {
     public boolean requireTargetingPlayer = true;
     public double bossRadius    = 100.0;
     public double normalRadius  = 16.0;
-    public double farRadius     = 36.0;
-    public double variantRadius = 32.0;
+    public double farRadius     = 32.0;
+    public double variantRadius = 16.0;
     public double banditRadius  = 32.0;
     public double creeperRadius = 3.0;
-    public double netherRadius  = 32.0;
     public boolean enableMusic  = true;
-    public boolean enableVariant = true;
-    public boolean enableBandit  = true;
-    public boolean enableNether  = true;
-    public boolean enableBoss    = true;
+    public MusicMode variantMode = MusicMode.ON;
+    public MusicMode banditMode  = MusicMode.ON;
+    public MusicMode netherMode  = MusicMode.ON;
+    public MusicMode raidMode    = MusicMode.ON;
+    public MusicMode bossMode    = MusicMode.ON;
     public float defaultVolume   = 0.5f;
     public float banditVolume    = 0.5f;
     public float netherVolume    = 0.5f;
+    public float raidVolume      = 0.5f;
     public float bossVolume      = 0.5f;
     public float underwaterPitch = 0.75f;
     public boolean useFade            = true;
@@ -67,15 +68,16 @@ public class BattleMusicConfig {
     public double  getVariantRadius()         { return variantRadius; }
     public double  getBanditRadius()          { return banditRadius; }
     public double  getCreeperRadius()         { return creeperRadius; }
-    public double  getNetherRadius()          { return netherRadius; }
     public boolean isEnableMusic()            { return enableMusic; }
-    public boolean isEnableVariant()          { return enableVariant; }
-    public boolean isEnableBandit()           { return enableBandit; }
-    public boolean isEnableNether()           { return enableNether; }
-    public boolean isEnableBoss()             { return enableBoss; }
+    public MusicMode getVariantMode()         { return variantMode != null ? variantMode : MusicMode.ON; }
+    public MusicMode getBanditMode()          { return banditMode  != null ? banditMode  : MusicMode.ON; }
+    public MusicMode getNetherMode()          { return netherMode  != null ? netherMode  : MusicMode.ON; }
+    public MusicMode getRaidMode()            { return raidMode    != null ? raidMode    : MusicMode.ON; }
+    public MusicMode getBossMode()            { return bossMode    != null ? bossMode    : MusicMode.ON; }
     public float   getDefaultVolume()         { return defaultVolume; }
     public float   getBanditVolume()          { return banditVolume; }
     public float   getNetherVolume()          { return netherVolume; }
+    public float   getRaidVolume()            { return raidVolume; }
     public float   getBossVolume()            { return bossVolume; }
     public float   getUnderwaterPitch()       { return underwaterPitch; }
     public boolean isUseFade()                { return useFade; }

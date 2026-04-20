@@ -81,7 +81,18 @@ public class MusicManager {
 
         for (CombatState state : removed) {
             LoopingSoundInstance sound = managedSounds.get(state);
-            if (sound != null) sound.beginFadeOut(useFade);
+            if (sound == null) continue;
+
+            boolean isPeer = (state == CombatState.OVERWORLD_NORMAL || state == CombatState.OVERWORLD_VARIANT);
+            boolean peerTakesOver = isPeer && (
+                newStates.contains(CombatState.OVERWORLD_NORMAL) ||
+                newStates.contains(CombatState.OVERWORLD_VARIANT));
+
+            if (peerTakesOver) {
+                sound.suppress(false);
+            } else {
+                sound.beginFadeOut(useFade);
+            }
         }
 
         for (CombatState state : added) {
@@ -137,6 +148,7 @@ public class MusicManager {
         if (states.isEmpty()) return CombatState.NONE;
 
         if (states.contains(CombatState.BOSS))             return CombatState.BOSS;
+        if (states.contains(CombatState.RAID))             return CombatState.RAID;
         if (states.contains(CombatState.OVERWORLD_BANDIT)) return CombatState.OVERWORLD_BANDIT;
         if (states.contains(CombatState.NETHER))           return CombatState.NETHER;
 
@@ -144,10 +156,8 @@ public class MusicManager {
         boolean hasNormal  = states.contains(CombatState.OVERWORLD_NORMAL);
 
         if (hasVariant || hasNormal) {
-            if ((currentAudibleState == CombatState.OVERWORLD_VARIANT && hasVariant) ||
-                (currentAudibleState == CombatState.OVERWORLD_NORMAL  && hasNormal)) {
-                return currentAudibleState;
-            }
+            if (currentAudibleState == CombatState.OVERWORLD_VARIANT && hasVariant) return CombatState.OVERWORLD_VARIANT;
+            if (currentAudibleState == CombatState.OVERWORLD_NORMAL  && hasNormal)  return CombatState.OVERWORLD_NORMAL;
             return hasVariant ? CombatState.OVERWORLD_VARIANT : CombatState.OVERWORLD_NORMAL;
         }
 
@@ -156,18 +166,40 @@ public class MusicManager {
 
     private static SoundEvent resolveSound(CombatState state, BattleMusicConfig cfg) {
         return switch (state) {
-            case OVERWORLD_VARIANT -> cfg.isEnableVariant() ? ModSounds.BATTLE_VARIANT : ModSounds.BATTLE_MUSIC;
-            case OVERWORLD_BANDIT  -> cfg.isEnableBandit()  ? ModSounds.BATTLE_BANDITS : ModSounds.BATTLE_MUSIC;
-            case NETHER            -> cfg.isEnableNether()  ? ModSounds.BATTLE_NETHER  : ModSounds.BATTLE_MUSIC;
-            case BOSS              -> cfg.isEnableBoss()    ? ModSounds.BATTLE_BOSS    : ModSounds.BATTLE_MUSIC;
-            case OVERWORLD_NORMAL  -> ModSounds.BATTLE_MUSIC;
-            default                -> null;
+            case OVERWORLD_VARIANT -> switch (cfg.getVariantMode()) {
+                case ON     -> ModSounds.BATTLE_VARIANT;
+                case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                case OFF    -> null;
+            };
+            case OVERWORLD_BANDIT -> switch (cfg.getBanditMode()) {
+                case ON     -> ModSounds.BATTLE_BANDITS;
+                case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                case OFF    -> null;
+            };
+            case NETHER -> switch (cfg.getNetherMode()) {
+                case ON     -> ModSounds.BATTLE_NETHER;
+                case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                case OFF    -> null;
+            };
+            case BOSS -> switch (cfg.getRaidMode()) {
+                case ON     -> ModSounds.BATTLE_RAID;
+                case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                case OFF    -> null;
+            };
+            case RAID -> switch (cfg.getBossMode()) {
+                case ON     -> ModSounds.BATTLE_BOSS;
+                case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                case OFF    -> null;
+            };
+            case OVERWORLD_NORMAL -> ModSounds.BATTLE_MUSIC;
+            default               -> null;
         };
     }
 
     private static float resolveVolume(CombatState state, BattleMusicConfig cfg) {
         return switch (state) {
             case BOSS             -> cfg.getBossVolume();
+            case RAID             -> cfg.getRaidVolume();
             case NETHER           -> cfg.getNetherVolume();
             case OVERWORLD_BANDIT -> cfg.getBanditVolume();
             default               -> cfg.getDefaultVolume();
