@@ -1,7 +1,7 @@
 {
   "battle_music":       { "sounds": [{"name": "battle_music:battle_music",       "stream": true}], "category": "music" },
   "battle_variant":     { "sounds": [{"name": "battle_music:battle_variant",     "stream": true}], "category": "music" },
-  "battle_bandits":     { "sounds": [{"name": "battle_music:battle_bandits",     "stream": true}], "category": "music" },
+  "battle_illager":     { "sounds": [{"name": "battle_music:battle_illager",     "stream": true}], "category": "music" },
   "battle_nether":      { "sounds": [{"name": "battle_music:battle_nether",      "stream": true}], "category": "music" },
   "battle_raid":        { "sounds": [{"name": "battle_music:battle_raid",        "stream": true}], "category": "music" },
   "battle_warden":      { "sounds": [{"name": "battle_music:battle_warden",      "stream": true}], "category": "music" },

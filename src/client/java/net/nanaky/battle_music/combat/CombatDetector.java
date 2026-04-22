@@ -37,7 +37,7 @@ public class CombatDetector {
     private static final TagKey<EntityType<?>> TAG_NORMAL  = tag("normal_hostiles");
     private static final TagKey<EntityType<?>> TAG_FAR     = tag("long_range");
     private static final TagKey<EntityType<?>> TAG_VARIANT = tag("variants");
-    private static final TagKey<EntityType<?>> TAG_BANDIT  = tag("bandits");
+    private static final TagKey<EntityType<?>> TAG_BANDIT  = tag("illagers");
 
     private static TagKey<EntityType<?>> tag(String path) {
         return TagKey.create(Registries.ENTITY_TYPE,
@@ -45,13 +45,23 @@ public class CombatDetector {
     }
 
     private static boolean isRaidActive(Minecraft mc) {
-        if (mc.player == null || mc.level == null) return false;
-        AABB box = mc.player.getBoundingBox().inflate(128);
-        return !mc.level.getEntitiesOfClass(
-            net.minecraft.world.entity.raid.Raider.class,
-            box,
-            raider -> !raider.isDeadOrDying()
-        ).isEmpty();
+        if (mc.player == null) return false;
+        try {
+            java.lang.reflect.Field f = net.minecraft.client.gui.components.BossHealthOverlay.class
+                    .getDeclaredField("events");
+            f.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            java.util.Map<java.util.UUID, net.minecraft.client.gui.components.LerpingBossEvent> events =
+                    (java.util.Map<java.util.UUID, net.minecraft.client.gui.components.LerpingBossEvent>) f.get(mc.gui.getBossOverlay());
+            for (net.minecraft.client.gui.components.LerpingBossEvent event : events.values()) {
+                net.minecraft.network.chat.ComponentContents contents = event.getName().getContents();
+                if (contents instanceof net.minecraft.network.chat.contents.TranslatableContents tc
+                        && tc.getKey().equals("event.minecraft.raid")) {
+                    return true;
+                }
+            }
+        } catch (Exception ignored) {}
+        return false;
     }
 
     public static void tick() {
@@ -144,7 +154,7 @@ public class CombatDetector {
         if (radius <= 0) return false;
         AABB box = player.getBoundingBox().inflate(radius);
         List<Mob> mobs = level.getEntitiesOfClass(Mob.class, box,
-                mob -> !mob.isDeadOrDying() && filter.test(mob));
+                mob -> !mob.isDeadOrDying() && !mob.hasCustomName() && filter.test(mob));
         if (mobs.isEmpty()) return false;
         return !requireTargeting || mobs.stream().anyMatch(CombatDetector::isThreateningPlayer);
     }
@@ -154,7 +164,7 @@ public class CombatDetector {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return false;
         if (mc.player.equals(mob.getTarget())) return true;
-        return isFar(mob) || isBandit(mob);
+        return isFar(mob) || isBandit(mob) || mob instanceof Slime;
     }
 
     private static boolean isBandit(Mob mob) {

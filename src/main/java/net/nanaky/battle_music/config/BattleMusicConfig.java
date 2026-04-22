@@ -19,18 +19,18 @@ public class BattleMusicConfig {
     public double normalRadius  = 16.0;
     public double farRadius     = 32.0;
     public double variantRadius = 16.0;
-    public double banditRadius  = 32.0;
+    public double illagerRadius  = 32.0;
     public double creeperRadius = 3.0;
     public boolean enableMusic  = true;
     public MusicMode variantMode = MusicMode.ON;
-    public MusicMode banditMode  = MusicMode.ON;
+    public MusicMode illagerMode  = MusicMode.ON;
     public MusicMode netherMode  = MusicMode.ON;
     public MusicMode raidMode    = MusicMode.ON;
     public MusicMode wardenMode  = MusicMode.ON;
     public MusicMode witherMode  = MusicMode.ON;
     public MusicMode dragonMode  = MusicMode.ON;
     public float defaultVolume   = 0.5f;
-    public float banditVolume    = 0.5f;
+    public float illagerVolume    = 0.5f;
     public float netherVolume    = 0.5f;
     public float raidVolume      = 0.5f;
     public float wardenVolume    = 0.5f;
@@ -70,18 +70,18 @@ public class BattleMusicConfig {
     public double  getNormalRadius()          { return normalRadius; }
     public double  getFarRadius()             { return farRadius; }
     public double  getVariantRadius()         { return variantRadius; }
-    public double  getBanditRadius()          { return banditRadius; }
+    public double  getBanditRadius()          { return illagerRadius; }
     public double  getCreeperRadius()         { return creeperRadius; }
     public boolean isEnableMusic()            { return enableMusic; }
     public MusicMode getVariantMode()         { return variantMode != null ? variantMode : MusicMode.ON; }
-    public MusicMode getBanditMode()          { return banditMode  != null ? banditMode  : MusicMode.ON; }
+    public MusicMode getBanditMode()          { return illagerMode  != null ? illagerMode  : MusicMode.ON; }
     public MusicMode getNetherMode()          { return netherMode  != null ? netherMode  : MusicMode.ON; }
     public MusicMode getRaidMode()            { return raidMode    != null ? raidMode    : MusicMode.ON; }
     public MusicMode getWardenMode()          { return wardenMode  != null ? wardenMode  : MusicMode.ON; }
     public MusicMode getWitherMode()          { return witherMode  != null ? witherMode  : MusicMode.ON; }
     public MusicMode getDragonMode()          { return dragonMode  != null ? dragonMode  : MusicMode.ON; }
     public float   getDefaultVolume()         { return defaultVolume; }
-    public float   getBanditVolume()          { return banditVolume; }
+    public float   getBanditVolume()          { return illagerVolume; }
     public float   getNetherVolume()          { return netherVolume; }
     public float   getRaidVolume()            { return raidVolume; }
     public float   getWardenVolume()          { return wardenVolume; }

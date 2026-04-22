@@ -12,14 +12,24 @@ import net.nanaky.battle_music.config.ConfigManager;
 import net.nanaky.battle_music.config.MusicMode;
 import net.nanaky.battle_music.music.MusicManager;
 
+import java.util.Optional;
+
 public class ModMenuIntegration implements ModMenuApi {
 
     private static Component modeLabel(MusicMode mode) {
         return switch (mode) {
-            case ON       -> Component.literal("ON (unique track)");
-            case FALLBACK -> Component.literal("NORMAL (fallback)");
-            case OFF      -> Component.literal("OFF (no music)");
+            case ON       -> Component.translatable("battle_music.config.mode.on");
+            case FALLBACK -> Component.translatable("battle_music.config.mode.fallback");
+            case OFF      -> Component.translatable("battle_music.config.mode.off");
         };
+    }
+
+    private static Optional<Component[]> modeTooltip(MusicMode mode) {
+        return Optional.of(new Component[]{ switch (mode) {
+            case ON       -> Component.translatable("battle_music.config.mode.on.tooltip");
+            case FALLBACK -> Component.translatable("battle_music.config.mode.fallback.tooltip");
+            case OFF      -> Component.translatable("battle_music.config.mode.off.tooltip");
+        }});
     }
 
     @Override
@@ -33,7 +43,7 @@ public class ModMenuIntegration implements ModMenuApi {
 
             ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
-                .setTitle(Component.literal("Battle Music"))
+                .setTitle(Component.translatable("battle_music.config.title"))
                 .setSavingRunnable(() -> {
                     ConfigManager.save();
                     MusicManager.onConfigChanged();
@@ -41,229 +51,222 @@ public class ModMenuIntegration implements ModMenuApi {
 
             ConfigEntryBuilder eb = builder.entryBuilder();
 
-            ConfigCategory music = builder.getOrCreateCategory(Component.literal("Music"));
+            ConfigCategory music = builder.getOrCreateCategory(Component.translatable("battle_music.config.category.music"));
 
             music.addEntry(eb.startBooleanToggle(
-                    Component.literal("ENABLE BATTLE MUSIC"), cfg.enableMusic)
+                    Component.translatable("battle_music.config.music.enable"), cfg.enableMusic)
                 .setDefaultValue(def.enableMusic)
-                .setTooltip(Component.literal("Master toggle. If off, no battle music plays at all."))
+                .setTooltip(Component.translatable("battle_music.config.music.enable.tooltip"))
                 .setSaveConsumer(v -> cfg.enableMusic = v)
                 .build());
 
             music.addEntry(eb.startEnumSelector(
-                    Component.literal("Variant Music"),
+                    Component.translatable("battle_music.config.music.variant_mode"),
                     MusicMode.class,
                     cfg.variantMode)
                 .setDefaultValue(def.variantMode)
-                .setTooltip(Component.literal(
-                    "ON = unique variant track | NORMAL = fallback to default | OFF = silence for variants"))
                 .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setTooltipSupplier(mode -> modeTooltip((MusicMode) mode))
                 .setSaveConsumer(v -> cfg.variantMode = v)
                 .build());
 
             music.addEntry(eb.startEnumSelector(
-                    Component.literal("Illager Music"),
+                    Component.translatable("battle_music.config.music.illager_mode"),
                     MusicMode.class,
-                    cfg.banditMode)
-                .setDefaultValue(def.banditMode)
-                .setTooltip(Component.literal(
-                    "ON = unique illager track | NORMAL = fallback to default | OFF = silence for illagers"))
+                    cfg.illagerMode)
+                .setDefaultValue(def.illagerMode)
                 .setEnumNameProvider(e -> modeLabel((MusicMode) e))
-                .setSaveConsumer(v -> cfg.banditMode = v)
+                .setTooltipSupplier(mode -> modeTooltip((MusicMode) mode))
+                .setSaveConsumer(v -> cfg.illagerMode = v)
                 .build());
 
             music.addEntry(eb.startEnumSelector(
-                    Component.literal("Nether Music"),
+                    Component.translatable("battle_music.config.music.nether_mode"),
                     MusicMode.class,
                     cfg.netherMode)
                 .setDefaultValue(def.netherMode)
-                .setTooltip(Component.literal(
-                    "ON = unique nether track | NORMAL = fallback to default | OFF = silence in nether combat"))
                 .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setTooltipSupplier(mode -> modeTooltip((MusicMode) mode))
                 .setSaveConsumer(v -> cfg.netherMode = v)
                 .build());
 
             music.addEntry(eb.startEnumSelector(
-                    Component.literal("Raid Music"),
+                    Component.translatable("battle_music.config.music.raid_mode"),
                     MusicMode.class,
                     cfg.raidMode)
                 .setDefaultValue(def.raidMode)
-                .setTooltip(Component.literal(
-                    "ON = unique raid track | NORMAL = fallback to default | OFF = silence during raids"))
                 .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setTooltipSupplier(mode -> modeTooltip((MusicMode) mode))
                 .setSaveConsumer(v -> cfg.raidMode = v)
                 .build());
 
-            ConfigCategory detection = builder.getOrCreateCategory(Component.literal("Detection Type"));
+            ConfigCategory detection = builder.getOrCreateCategory(Component.translatable("battle_music.config.category.detection"));
 
             detection.addEntry(eb.startBooleanToggle(
-                    Component.literal("Require Mob Targeting Player"), cfg.requireTargetingPlayer)
+                    Component.translatable("battle_music.config.detection.require_targeting"), cfg.requireTargetingPlayer)
                 .setDefaultValue(def.requireTargetingPlayer)
-                .setTooltip(Component.literal("Only trigger music when a mob is actively targeting you."))
+                .setTooltip(Component.translatable("battle_music.config.detection.require_targeting.tooltip"))
                 .setSaveConsumer(v -> cfg.requireTargetingPlayer = v)
                 .build());
 
             detection.addEntry(eb.startIntSlider(
-                    Component.literal("Check Interval (ticks)"), cfg.checkIntervalTicks, 1, 40)
+                    Component.translatable("battle_music.config.detection.check_interval"), cfg.checkIntervalTicks, 1, 40)
                 .setDefaultValue(def.checkIntervalTicks)
-                .setTooltip(Component.literal("How often combat is checked. 10 = every 0.5s."))
+                .setTooltip(Component.translatable("battle_music.config.detection.check_interval.tooltip"))
                 .setSaveConsumer(v -> cfg.checkIntervalTicks = v)
                 .build());
 
-            ConfigCategory radii = builder.getOrCreateCategory(Component.literal("Detection Radius"));
+            ConfigCategory radii = builder.getOrCreateCategory(Component.translatable("battle_music.config.category.radius"));
 
             radii.addEntry(eb.startIntSlider(
-                    Component.literal("Normal Mob Radius"), (int) cfg.normalRadius, 1, 64)
+                    Component.translatable("battle_music.config.radius.normal"), (int) cfg.normalRadius, 1, 64)
                 .setDefaultValue((int) def.normalRadius)
                 .setSaveConsumer(v -> cfg.normalRadius = v)
                 .build());
 
             radii.addEntry(eb.startIntSlider(
-                    Component.literal("Variant Mob Radius"), (int) cfg.variantRadius, 1, 64)
+                    Component.translatable("battle_music.config.radius.variant"), (int) cfg.variantRadius, 1, 64)
                 .setDefaultValue((int) def.variantRadius)
                 .setSaveConsumer(v -> cfg.variantRadius = v)
                 .build());
 
             radii.addEntry(eb.startIntSlider(
-                    Component.literal("Illager Radius"), (int) cfg.banditRadius, 1, 64)
-                .setDefaultValue((int) def.banditRadius)
-                .setSaveConsumer(v -> cfg.banditRadius = v)
+                    Component.translatable("battle_music.config.radius.illager"), (int) cfg.illagerRadius, 1, 64)
+                .setDefaultValue((int) def.illagerRadius)
+                .setSaveConsumer(v -> cfg.illagerRadius = v)
                 .build());
 
             radii.addEntry(eb.startIntSlider(
-                    Component.literal("Far Hostile Radius"), (int) cfg.farRadius, 1, 128)
+                    Component.translatable("battle_music.config.radius.far"), (int) cfg.farRadius, 1, 128)
                 .setDefaultValue((int) def.farRadius)
                 .setSaveConsumer(v -> cfg.farRadius = v)
                 .build());
 
             radii.addEntry(eb.startIntSlider(
-                    Component.literal("Creeper Radius"), (int) cfg.creeperRadius, 1, 32)
+                    Component.translatable("battle_music.config.radius.creeper"), (int) cfg.creeperRadius, 1, 32)
                 .setDefaultValue((int) def.creeperRadius)
-                .setTooltip(Component.literal("Creepers only trigger music very close by default."))
+                .setTooltip(Component.translatable("battle_music.config.radius.creeper.tooltip"))
                 .setSaveConsumer(v -> cfg.creeperRadius = v)
                 .build());
 
             radii.addEntry(eb.startIntSlider(
-                    Component.literal("Boss Radius"), (int) cfg.bossRadius, 1, 256)
+                    Component.translatable("battle_music.config.radius.boss"), (int) cfg.bossRadius, 1, 256)
                 .setDefaultValue((int) def.bossRadius)
-                .setTooltip(Component.literal("Detection Radius for Wither, Warden, Ender Dragon."))
+                .setTooltip(Component.translatable("battle_music.config.radius.boss.tooltip"))
                 .setSaveConsumer(v -> cfg.bossRadius = v)
                 .build());
 
-            ConfigCategory bosses = builder.getOrCreateCategory(Component.literal("Bosses"));
+            ConfigCategory bosses = builder.getOrCreateCategory(Component.translatable("battle_music.config.category.bosses"));
 
             bosses.addEntry(eb.startEnumSelector(
-                    Component.literal("Warden Music"),
+                    Component.translatable("battle_music.config.bosses.warden_mode"),
                     MusicMode.class,
                     cfg.wardenMode)
                 .setDefaultValue(def.wardenMode)
-                .setTooltip(Component.literal(
-                    "ON = unique warden track | NORMAL = fallback to default | OFF = silence for warden"))
                 .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setTooltipSupplier(mode -> modeTooltip((MusicMode) mode))
                 .setSaveConsumer(v -> cfg.wardenMode = v)
                 .build());
 
             bosses.addEntry(eb.startIntSlider(
-                    Component.literal("Warden Volume (%)"), (int)(cfg.wardenVolume * 100), 0, 100)
+                    Component.translatable("battle_music.config.bosses.warden_volume"), (int)(cfg.wardenVolume * 100), 0, 100)
                 .setDefaultValue((int)(def.wardenVolume * 100))
                 .setSaveConsumer(v -> cfg.wardenVolume = v / 100f)
                 .build());
 
             bosses.addEntry(eb.startEnumSelector(
-                    Component.literal("Wither Music"),
+                    Component.translatable("battle_music.config.bosses.wither_mode"),
                     MusicMode.class,
                     cfg.witherMode)
                 .setDefaultValue(def.witherMode)
-                .setTooltip(Component.literal(
-                    "ON = unique wither track | NORMAL = fallback to default | OFF = silence for wither"))
                 .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setTooltipSupplier(mode -> modeTooltip((MusicMode) mode))
                 .setSaveConsumer(v -> cfg.witherMode = v)
                 .build());
 
             bosses.addEntry(eb.startIntSlider(
-                    Component.literal("Wither Volume (%)"), (int)(cfg.witherVolume * 100), 0, 100)
+                    Component.translatable("battle_music.config.bosses.wither_volume"), (int)(cfg.witherVolume * 100), 0, 100)
                 .setDefaultValue((int)(def.witherVolume * 100))
                 .setSaveConsumer(v -> cfg.witherVolume = v / 100f)
                 .build());
 
             bosses.addEntry(eb.startEnumSelector(
-                    Component.literal("Ender Dragon Music"),
+                    Component.translatable("battle_music.config.bosses.dragon_mode"),
                     MusicMode.class,
                     cfg.dragonMode)
                 .setDefaultValue(def.dragonMode)
-                .setTooltip(Component.literal(
-                    "ON = unique dragon track | NORMAL = fallback to default | OFF = silence for dragon"))
                 .setEnumNameProvider(e -> modeLabel((MusicMode) e))
+                .setTooltipSupplier(mode -> modeTooltip((MusicMode) mode))
                 .setSaveConsumer(v -> cfg.dragonMode = v)
                 .build());
 
             bosses.addEntry(eb.startIntSlider(
-                    Component.literal("Ender Dragon Volume (%)"), (int)(cfg.dragonVolume * 100), 0, 100)
+                    Component.translatable("battle_music.config.bosses.dragon_volume"), (int)(cfg.dragonVolume * 100), 0, 100)
                 .setDefaultValue((int)(def.dragonVolume * 100))
                 .setSaveConsumer(v -> cfg.dragonVolume = v / 100f)
                 .build());
 
-            ConfigCategory volume = builder.getOrCreateCategory(Component.literal("Volume"));
+            ConfigCategory volume = builder.getOrCreateCategory(Component.translatable("battle_music.config.category.volume"));
 
             volume.addEntry(eb.startIntSlider(
-                    Component.literal("Default Volume (%)"), (int)(cfg.defaultVolume * 100), 0, 100)
+                    Component.translatable("battle_music.config.volume.default"), (int)(cfg.defaultVolume * 100), 0, 100)
                 .setDefaultValue((int)(def.defaultVolume * 100))
-                .setTooltip(Component.literal("Volume for Overworld Normal Battle Music."))
+                .setTooltip(Component.translatable("battle_music.config.volume.default.tooltip"))
                 .setSaveConsumer(v -> cfg.defaultVolume = v / 100f)
                 .build());
 
             volume.addEntry(eb.startIntSlider(
-                    Component.literal("Illager Volume (%)"), (int)(cfg.banditVolume * 100), 0, 100)
-                .setDefaultValue((int)(def.banditVolume * 100))
-                .setSaveConsumer(v -> cfg.banditVolume = v / 100f)
+                    Component.translatable("battle_music.config.volume.illager"), (int)(cfg.illagerVolume * 100), 0, 100)
+                .setDefaultValue((int)(def.illagerVolume * 100))
+                .setSaveConsumer(v -> cfg.illagerVolume = v / 100f)
                 .build());
 
             volume.addEntry(eb.startIntSlider(
-                    Component.literal("Raid Volume (%)"), (int)(cfg.raidVolume * 100), 0, 100)
+                    Component.translatable("battle_music.config.volume.raid"), (int)(cfg.raidVolume * 100), 0, 100)
                 .setDefaultValue((int)(def.raidVolume * 100))
                 .setSaveConsumer(v -> cfg.raidVolume = v / 100f)
                 .build());
 
             volume.addEntry(eb.startIntSlider(
-                    Component.literal("Nether Volume (%)"), (int)(cfg.netherVolume * 100), 0, 100)
+                    Component.translatable("battle_music.config.volume.nether"), (int)(cfg.netherVolume * 100), 0, 100)
                 .setDefaultValue((int)(def.netherVolume * 100))
                 .setSaveConsumer(v -> cfg.netherVolume = v / 100f)
                 .build());
 
             volume.addEntry(eb.startIntSlider(
-                    Component.literal("Fluid Pitch (%)"), (int)(cfg.underwaterPitch * 100), 50, 200)
+                    Component.translatable("battle_music.config.volume.fluid_pitch"), (int)(cfg.underwaterPitch * 100), 50, 200)
                 .setDefaultValue((int)(def.underwaterPitch * 100))
-                .setTooltip(Component.literal("Pitch when inside Water or Lava. 75 = lower/deeper tone."))
+                .setTooltip(Component.translatable("battle_music.config.volume.fluid_pitch.tooltip"))
                 .setSaveConsumer(v -> cfg.underwaterPitch = v / 100f)
                 .build());
 
-            ConfigCategory fade = builder.getOrCreateCategory(Component.literal("Fade"));
+            ConfigCategory fade = builder.getOrCreateCategory(Component.translatable("battle_music.config.category.fade"));
 
             fade.addEntry(eb.startBooleanToggle(
-                    Component.literal("Use Fade"), cfg.useFade)
+                    Component.translatable("battle_music.config.fade.use_fade"), cfg.useFade)
                 .setDefaultValue(def.useFade)
-                .setTooltip(Component.literal("Enable fade out and ghost revival. Disable for hard cuts."))
+                .setTooltip(Component.translatable("battle_music.config.fade.use_fade.tooltip"))
                 .setSaveConsumer(v -> cfg.useFade = v)
                 .build());
 
             fade.addEntry(eb.startIntSlider(
-                    Component.literal("Fade Out (ticks)"), cfg.fadeOutTicks, 1, 200)
+                    Component.translatable("battle_music.config.fade.fade_out"), cfg.fadeOutTicks, 1, 200)
                 .setDefaultValue(def.fadeOutTicks)
-                .setTooltip(Component.literal("How long music takes to fade out. 60 = 3 seconds."))
+                .setTooltip(Component.translatable("battle_music.config.fade.fade_out.tooltip"))
                 .setSaveConsumer(v -> cfg.fadeOutTicks = v)
                 .build());
 
             fade.addEntry(eb.startIntSlider(
-                    Component.literal("Revive Fade In (ticks)"), cfg.reviveFadeInTicks, 1, 200)
+                    Component.translatable("battle_music.config.fade.revive_fade_in"), cfg.reviveFadeInTicks, 1, 200)
                 .setDefaultValue(def.reviveFadeInTicks)
-                .setTooltip(Component.literal("How long music fades back in on ghost revive. 40 = 2 seconds."))
+                .setTooltip(Component.translatable("battle_music.config.fade.revive_fade_in.tooltip"))
                 .setSaveConsumer(v -> cfg.reviveFadeInTicks = v)
                 .build());
 
             fade.addEntry(eb.startIntSlider(
-                    Component.literal("Ghost Duration (ticks)"), cfg.ghostDurationTicks, 1, 600)
+                    Component.translatable("battle_music.config.fade.ghost_duration"), cfg.ghostDurationTicks, 1, 600)
                 .setDefaultValue(def.ghostDurationTicks)
-                .setTooltip(Component.literal("How long track loops silently before stopping. 200 = 10 seconds."))
+                .setTooltip(Component.translatable("battle_music.config.fade.ghost_duration.tooltip"))
                 .setSaveConsumer(v -> cfg.ghostDurationTicks = v)
                 .build());
 
