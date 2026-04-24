@@ -19,7 +19,7 @@ public class BattleMusicConfig {
     public double normalRadius  = 16.0;
     public double farRadius     = 32.0;
     public double variantRadius = 16.0;
-    public double illagerRadius  = 32.0;
+    public double illagerRadius  = 16.0;
     public double creeperRadius = 3.0;
     public boolean enableMusic  = true;
     public MusicMode variantMode = MusicMode.ON;
