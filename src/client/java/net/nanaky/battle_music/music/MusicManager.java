@@ -16,6 +16,8 @@ public class MusicManager {
 
     private static Set<CombatState> activeStates = EnumSet.noneOf(CombatState.class);
     private static CombatState currentAudibleState = CombatState.NONE;
+    private static CombatState lockedPeer          = CombatState.NONE;
+
     private static int     fluidPitchDelayTick = 0;
     private static boolean wasInFluid          = false;
     private static final int FLUID_PITCH_DELAY = 50;
@@ -82,22 +84,22 @@ public class MusicManager {
         for (CombatState state : removed) {
             LoopingSoundInstance sound = managedSounds.get(state);
             if (sound == null) continue;
+            if (isPeer(state) && state != lockedPeer) continue;
 
-            boolean isPeer = (state == CombatState.OVERWORLD_NORMAL || state == CombatState.OVERWORLD_VARIANT);
-            boolean peerTakesOver = isPeer && (
-                newStates.contains(CombatState.OVERWORLD_NORMAL) ||
-                newStates.contains(CombatState.OVERWORLD_VARIANT));
-
-            if (peerTakesOver) {
-                sound.suppress(false);
-            } else {
-                sound.beginFadeOut(useFade);
-            }
+            sound.beginFadeOut(useFade);
         }
 
         for (CombatState state : added) {
             LoopingSoundInstance existing = managedSounds.get(state);
             boolean willBeAudible         = (state == desiredAudible);
+
+            boolean staleSuppressed = existing != null && !existing.isRevivable()
+                                    && !existing.isStopped() && isPeer(state) && willBeAudible;
+
+            if (staleSuppressed) {
+                existing.beginFadeOut(false);
+                existing = null;
+            }
 
             if (existing != null && existing.isRevivable()) {
                 existing.revive(useFade && willBeAudible);
@@ -142,6 +144,11 @@ public class MusicManager {
         managedSounds.clear();
         activeStates        = EnumSet.noneOf(CombatState.class);
         currentAudibleState = CombatState.NONE;
+        lockedPeer          = CombatState.NONE;
+    }
+
+    private static boolean isPeer(CombatState s) {
+        return s == CombatState.OVERWORLD_NORMAL || s == CombatState.OVERWORLD_VARIANT;
     }
 
     private static CombatState resolveAudibleState(Set<CombatState> states, BattleMusicConfig cfg) {
@@ -156,14 +163,20 @@ public class MusicManager {
 
         boolean hasVariant = states.contains(CombatState.OVERWORLD_VARIANT);
         boolean hasNormal  = states.contains(CombatState.OVERWORLD_NORMAL);
+        if (!hasVariant && !hasNormal) return CombatState.NONE;
 
-        if (hasVariant || hasNormal) {
-            if (currentAudibleState == CombatState.OVERWORLD_VARIANT && hasVariant) return CombatState.OVERWORLD_VARIANT;
-            if (currentAudibleState == CombatState.OVERWORLD_NORMAL  && hasNormal)  return CombatState.OVERWORLD_NORMAL;
-            return hasVariant ? CombatState.OVERWORLD_VARIANT : CombatState.OVERWORLD_NORMAL;
+        // Lock still alive — keep playing whatever won first, regardless of which mobs remain
+        if (lockedPeer != CombatState.NONE) {
+            LoopingSoundInstance locked = managedSounds.get(lockedPeer);
+            if (locked != null && !locked.isStopped()) return lockedPeer;
+            // Lock expired — fall through to pick fresh
+            lockedPeer = CombatState.NONE;
         }
 
-        return CombatState.NONE;
+        // No lock — first play, use tag to decide song
+        CombatState winner = hasVariant ? CombatState.OVERWORLD_VARIANT : CombatState.OVERWORLD_NORMAL;
+        lockedPeer = winner;
+        return winner;
     }
 
     private static SoundEvent resolveSound(CombatState state, BattleMusicConfig cfg) {
