@@ -38,6 +38,7 @@ public class CombatDetector {
     private static final TagKey<EntityType<?>> TAG_FAR     = tag("long_range");
     private static final TagKey<EntityType<?>> TAG_VARIANT = tag("variants");
     private static final TagKey<EntityType<?>> TAG_BANDIT  = tag("illagers");
+    public static boolean isVariantPublic(Mob mob) { return isVariant(mob); }
 
     private static TagKey<EntityType<?>> tag(String path) {
         return TagKey.create(Registries.ENTITY_TYPE,
@@ -123,28 +124,20 @@ public class CombatDetector {
         if (isRaidActive(mc))
             states.add(CombatState.RAID);
 
-        if (level.dimension().equals(Level.NETHER)) {
-            if (hasThreat(player, level, cfg.getBanditRadius(), reqTarget, CombatDetector::isBandit)
-                || hasThreat(player, level, cfg.getVariantRadius(), reqTarget, CombatDetector::isVariant)
-                || hasThreat(player, level, cfg.getNormalRadius(), reqTarget, CombatDetector::isNormal)
-                || hasThreat(player, level, cfg.getFarRadius(), false, CombatDetector::isFar)
-                || hasThreat(player, level, cfg.getCreeperRadius(), reqTarget, mob -> mob instanceof Creeper))
-                states.add(CombatState.NETHER);
-            return states;
-        }
-
-        if (!level.dimension().equals(Level.OVERWORLD)) return states;
-
         if (hasThreat(player, level, cfg.getBanditRadius(), reqTarget, CombatDetector::isBandit))
-            states.add(CombatState.OVERWORLD_BANDIT);
+            states.add(CombatState.BANDIT);
 
-        if (hasThreat(player, level, cfg.getVariantRadius(), reqTarget, CombatDetector::isVariant))
-            states.add(CombatState.OVERWORLD_VARIANT);
-
-        if (hasThreat(player, level, cfg.getNormalRadius(), reqTarget, CombatDetector::isNormal)
+        if (hasThreat(player, level, cfg.getVariantRadius(), reqTarget, CombatDetector::isVariant)
+            || hasThreat(player, level, cfg.getNormalRadius(), reqTarget, CombatDetector::isNormal)
             || hasThreat(player, level, cfg.getFarRadius(), false, CombatDetector::isFar)
-            || hasThreat(player, level, cfg.getCreeperRadius(), reqTarget, mob -> mob instanceof Creeper))
-            states.add(CombatState.OVERWORLD_NORMAL);
+            || hasThreat(player, level, cfg.getCreeperRadius(), reqTarget, mob -> mob instanceof Creeper)) {
+            
+            if (level.dimension().equals(Level.NETHER))
+                states.add(CombatState.NETHER);
+            else {
+                states.add(CombatState.OVERWORLD);
+            }
+        }
 
         return states;
     }

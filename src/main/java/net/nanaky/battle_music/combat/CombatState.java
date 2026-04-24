@@ -2,10 +2,9 @@ package net.nanaky.battle_music.combat;
 
 public enum CombatState {
     NONE(0),
-    OVERWORLD_NORMAL(1),
-    OVERWORLD_VARIANT(2),
+    OVERWORLD(1),
     NETHER(3),
-    OVERWORLD_BANDIT(4),
+    BANDIT(4),
     RAID(5),
     WARDEN(6),
     WITHER(7),

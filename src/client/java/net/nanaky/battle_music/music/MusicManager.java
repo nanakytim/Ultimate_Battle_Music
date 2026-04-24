@@ -1,11 +1,13 @@
 package net.nanaky.battle_music.music;
 
+import net.nanaky.battle_music.combat.CombatDetector;
 import net.nanaky.battle_music.combat.CombatState;
 import net.nanaky.battle_music.config.BattleMusicConfig;
 import net.nanaky.battle_music.config.ConfigManager;
 import net.nanaky.battle_music.registry.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.phys.AABB;
 
 import java.util.*;
 
@@ -16,7 +18,6 @@ public class MusicManager {
 
     private static Set<CombatState> activeStates = EnumSet.noneOf(CombatState.class);
     private static CombatState currentAudibleState = CombatState.NONE;
-    private static CombatState lockedPeer          = CombatState.NONE;
 
     private static int     fluidPitchDelayTick = 0;
     private static boolean wasInFluid          = false;
@@ -84,22 +85,12 @@ public class MusicManager {
         for (CombatState state : removed) {
             LoopingSoundInstance sound = managedSounds.get(state);
             if (sound == null) continue;
-            if (isPeer(state) && state != lockedPeer) continue;
-
             sound.beginFadeOut(useFade);
         }
 
         for (CombatState state : added) {
             LoopingSoundInstance existing = managedSounds.get(state);
             boolean willBeAudible         = (state == desiredAudible);
-
-            boolean staleSuppressed = existing != null && !existing.isRevivable()
-                                    && !existing.isStopped() && isPeer(state) && willBeAudible;
-
-            if (staleSuppressed) {
-                existing.beginFadeOut(false);
-                existing = null;
-            }
 
             if (existing != null && existing.isRevivable()) {
                 existing.revive(useFade && willBeAudible);
@@ -144,11 +135,6 @@ public class MusicManager {
         managedSounds.clear();
         activeStates        = EnumSet.noneOf(CombatState.class);
         currentAudibleState = CombatState.NONE;
-        lockedPeer          = CombatState.NONE;
-    }
-
-    private static boolean isPeer(CombatState s) {
-        return s == CombatState.OVERWORLD_NORMAL || s == CombatState.OVERWORLD_VARIANT;
     }
 
     private static CombatState resolveAudibleState(Set<CombatState> states, BattleMusicConfig cfg) {
@@ -158,35 +144,15 @@ public class MusicManager {
         if (states.contains(CombatState.WITHER))           return CombatState.WITHER;
         if (states.contains(CombatState.WARDEN))           return CombatState.WARDEN;
         if (states.contains(CombatState.RAID))             return CombatState.RAID;
-        if (states.contains(CombatState.OVERWORLD_BANDIT)) return CombatState.OVERWORLD_BANDIT;
+        if (states.contains(CombatState.BANDIT))           return CombatState.BANDIT;
         if (states.contains(CombatState.NETHER))           return CombatState.NETHER;
-
-        boolean hasVariant = states.contains(CombatState.OVERWORLD_VARIANT);
-        boolean hasNormal  = states.contains(CombatState.OVERWORLD_NORMAL);
-        if (!hasVariant && !hasNormal) return CombatState.NONE;
-
-        // Lock still alive — keep playing whatever won first, regardless of which mobs remain
-        if (lockedPeer != CombatState.NONE) {
-            LoopingSoundInstance locked = managedSounds.get(lockedPeer);
-            if (locked != null && !locked.isStopped()) return lockedPeer;
-            // Lock expired — fall through to pick fresh
-            lockedPeer = CombatState.NONE;
-        }
-
-        // No lock — first play, use tag to decide song
-        CombatState winner = hasVariant ? CombatState.OVERWORLD_VARIANT : CombatState.OVERWORLD_NORMAL;
-        lockedPeer = winner;
-        return winner;
+        if (states.contains(CombatState.OVERWORLD))        return CombatState.OVERWORLD;
+        return CombatState.NONE;   
     }
 
     private static SoundEvent resolveSound(CombatState state, BattleMusicConfig cfg) {
         return switch (state) {
-            case OVERWORLD_VARIANT -> switch (cfg.getVariantMode()) {
-                case ON       -> ModSounds.BATTLE_VARIANT;
-                case FALLBACK -> ModSounds.BATTLE_MUSIC;
-                case OFF      -> null;
-            };
-            case OVERWORLD_BANDIT -> switch (cfg.getBanditMode()) {
+            case BANDIT -> switch (cfg.getBanditMode()) {
                 case ON       -> ModSounds.BATTLE_BANDITS;
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
                 case OFF      -> null;
@@ -216,8 +182,24 @@ public class MusicManager {
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
                 case OFF      -> null;
             };
-            case OVERWORLD_NORMAL -> ModSounds.BATTLE_MUSIC;
-            default               -> null;
+            case OVERWORLD -> {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null && mc.level != null) {
+                BattleMusicConfig c = ConfigManager.getInstance();
+                AABB box = mc.player.getBoundingBox().inflate(c.getVariantRadius());
+                boolean hasVariant = !mc.level.getEntitiesOfClass(
+                    net.minecraft.world.entity.Mob.class, box,
+                    mob -> !mob.isDeadOrDying() && !mob.hasCustomName() && CombatDetector.isVariantPublic(mob)
+                ).isEmpty();
+                if (hasVariant) yield switch (cfg.getVariantMode()) {
+                    case ON       -> ModSounds.BATTLE_VARIANT;
+                    case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                    case OFF      -> ModSounds.BATTLE_MUSIC;
+                };
+            }
+            yield ModSounds.BATTLE_MUSIC;
+            }
+            case NONE -> null;
         };
     }
 
@@ -228,7 +210,7 @@ public class MusicManager {
             case WARDEN           -> cfg.getWardenVolume();
             case RAID             -> cfg.getRaidVolume();
             case NETHER           -> cfg.getNetherVolume();
-            case OVERWORLD_BANDIT -> cfg.getBanditVolume();
+            case BANDIT -> cfg.getBanditVolume();
             default               -> cfg.getDefaultVolume();
         };
     }
