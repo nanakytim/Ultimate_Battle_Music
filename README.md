@@ -1,3 +1,5 @@
+<img width="512" height="512" alt="ultimate_battle_music" src="https://github.com/user-attachments/assets/b54dffe1-9901-4ba1-9504-83b3b9d3de27" />
+
 # CONFIGURATION
 ### This Mod is highly customisable to your taste:
 - **DIFFERENT SONGS:** Add a single song or many! You can have a unique Battle music for Illagers, the Nether, and mob variants (such as Husk and Stray). Finally, you can have a unique musique for each vanilla Boss, and for Raids! Each of those can be disabled **or** play the normal Battle music instead.
