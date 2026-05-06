@@ -1,4 +1,4 @@
-<img width="512" height="512" alt="ultimate_battle_music" src="https://github.com/user-attachments/assets/b54dffe1-9901-4ba1-9504-83b3b9d3de27" />
+<img width="512" height="512" alt="ultimate_battle_music" src="https://github.com/user-attachments/assets/4a6f683a-942e-48ec-bfb1-269a9e4f5ea1" />
 
 # CONFIGURATION
 ### This Mod is highly customisable to your taste:
