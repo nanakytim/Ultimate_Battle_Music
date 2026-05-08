@@ -13,7 +13,7 @@
 ### ALL BATTLE MUSIC TYPES:
 These are ordered by priority. The higher priority will always play and force a fade-out on the others. For example, if you're fighting spiders and a Pillager Patrol spawns, the music will fade into the Illagers theme song!
 
-This Mod provides default music. You can replace them with your own by overwriting the songs with a Resource Pack! The path for each file is as follows: assets\battle_music\sounds\
+This Mod provides default music. You can replace them with your own by overwriting the songs with a Resource Pack! The path for each file is as follows: assets\ultimate_battle_music\sounds\
 1. **Bosses:** battle_enderdragon.ogg | battle_wither.ogg | battle_warden.ogg
 2. **Raid:** battle_raid.ogg
 3. **Illagers:** battle_illager.ogg

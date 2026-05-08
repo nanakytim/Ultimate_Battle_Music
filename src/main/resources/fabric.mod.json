@@ -1,23 +1,23 @@
 {
 	"schemaVersion": 1,
-	"id": "battle_music",
+	"id": "ultimate_battle_music",
 	"version": "${version}",
-	"name": "Battle Music",
+	"name": "Ultimate Battle Music",
 	"description": "Plays music during combat",
 	"authors": [
 		"Nanaky"
 	],
 	"contact": {
 		"homepage": "https://github.com/nanakytim",
-		"sources": "https://github.com/nanakytim/battle_music"
+		"sources": "https://github.com/nanakytim/ultimate_battle_music"
 	},
 	"license": "GPL-3.0",
 	"icon": "icon.png",
 	"environment": "client",
 	"entrypoints": {
-		"main": ["net.nanaky.battle_music.BattleMusicMod"],
-    	"client": ["net.nanaky.battle_music.BattleMusicClient"],
-    	"modmenu": ["net.nanaky.battle_music.ModMenuIntegration"]
+		"main": ["net.nanaky.ultimate_battle_music.UltimateBattleMusicMod"],
+    	"client": ["net.nanaky.ultimate_battle_music.UltimateBattleMusicClient"],
+    	"modmenu": ["net.nanaky.ultimate_battle_music.ModMenuIntegration"]
 	},
 	"mixins": [
 	],

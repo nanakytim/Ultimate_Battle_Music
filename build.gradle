@@ -39,7 +39,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"battle_music" {
+		"ultimate_battle_music" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
