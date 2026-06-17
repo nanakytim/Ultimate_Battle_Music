@@ -10,6 +10,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.*;
+import net.minecraft.world.entity.monster.cubemob.*;
 import net.minecraft.world.entity.monster.zombie.*;
 import net.minecraft.world.entity.monster.skeleton.*;
 import net.minecraft.world.entity.monster.spider.*;
@@ -54,7 +55,7 @@ public class CombatDetector {
             f.setAccessible(true);
             @SuppressWarnings("unchecked")
             java.util.Map<java.util.UUID, net.minecraft.client.gui.components.LerpingBossEvent> events =
-                    (java.util.Map<java.util.UUID, net.minecraft.client.gui.components.LerpingBossEvent>) f.get(mc.gui.getBossOverlay());
+                    (java.util.Map<java.util.UUID, net.minecraft.client.gui.components.LerpingBossEvent>) f.get(mc.gui.hud.getBossOverlay());
             for (net.minecraft.client.gui.components.LerpingBossEvent event : events.values()) {
                 net.minecraft.network.chat.ComponentContents contents = event.getName().getContents();
                 if (contents instanceof net.minecraft.network.chat.contents.TranslatableContents tc
