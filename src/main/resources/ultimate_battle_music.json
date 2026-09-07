@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "net.nanaky.battle_music.mixin",
+  "package": "net.nanaky.ultimate_battle_music.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
   ],

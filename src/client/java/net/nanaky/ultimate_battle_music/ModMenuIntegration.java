@@ -1,4 +1,4 @@
-package net.nanaky.battle_music;
+package net.nanaky.ultimate_battle_music;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
@@ -7,10 +7,10 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.network.chat.Component;
-import net.nanaky.battle_music.config.BattleMusicConfig;
-import net.nanaky.battle_music.config.ConfigManager;
-import net.nanaky.battle_music.config.MusicMode;
-import net.nanaky.battle_music.music.MusicManager;
+import net.nanaky.ultimate_battle_music.config.BattleMusicConfig;
+import net.nanaky.ultimate_battle_music.config.ConfigManager;
+import net.nanaky.ultimate_battle_music.config.MusicMode;
+import net.nanaky.ultimate_battle_music.music.MusicManager;
 
 public class ModMenuIntegration implements ModMenuApi {
 
@@ -34,7 +34,7 @@ public class ModMenuIntegration implements ModMenuApi {
 
             ConfigBuilder builder = ConfigBuilder.create()
                 .setParentScreen(parent)
-                .setTitle(Component.literal("Battle Music"))
+                .setTitle(Component.literal("Ultimate Battle Music"))
                 .setSavingRunnable(() -> {
                     ConfigManager.save();
                     MusicManager.onConfigChanged();

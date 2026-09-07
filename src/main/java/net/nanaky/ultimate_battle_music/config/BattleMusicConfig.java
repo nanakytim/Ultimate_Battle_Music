@@ -1,6 +1,6 @@
-package net.nanaky.battle_music.config;
+package net.nanaky.ultimate_battle_music.config;
 
-import net.nanaky.battle_music.BattleMusicMod;
+import net.nanaky.ultimate_battle_music.UltimateBattleMusicMod;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
@@ -39,12 +39,12 @@ public class BattleMusicConfig {
     public int     ghostDurationTicks = 120;
 
     public static void load() {
-        Path path = FabricLoader.getInstance().getConfigDir().resolve("battle_music.json");
+        Path path = FabricLoader.getInstance().getConfigDir().resolve("ultimate_battle_music.json");
         if (Files.exists(path)) {
             try {
                 instance = GSON.fromJson(Files.readString(path), BattleMusicConfig.class);
             } catch (IOException e) {
-                BattleMusicMod.LOGGER.error("Failed to load config, using defaults", e);
+                UltimateBattleMusicMod.LOGGER.error("Failed to load config, using defaults", e);
                 instance = new BattleMusicConfig();
             }
         } else {
@@ -55,7 +55,7 @@ public class BattleMusicConfig {
 
     private static void save(Path path) {
         try { Files.writeString(path, GSON.toJson(instance)); }
-        catch (IOException e) { BattleMusicMod.LOGGER.error("Failed to save config", e); }
+        catch (IOException e) { UltimateBattleMusicMod.LOGGER.error("Failed to save config", e); }
     }
 
     public static BattleMusicConfig getInstance() { return instance; }

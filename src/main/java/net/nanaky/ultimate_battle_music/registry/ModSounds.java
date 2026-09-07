@@ -1,6 +1,6 @@
-package net.nanaky.battle_music.registry;
+package net.nanaky.ultimate_battle_music.registry;
 
-import net.nanaky.battle_music.BattleMusicMod;
+import net.nanaky.ultimate_battle_music.UltimateBattleMusicMod;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
@@ -25,7 +25,7 @@ public class ModSounds {
     }
 
     private static SoundEvent reg(String name) {
-        Identifier id = Identifier.fromNamespaceAndPath(BattleMusicMod.MOD_ID, name);
+        Identifier id = Identifier.fromNamespaceAndPath(UltimateBattleMusicMod.MOD_ID, name);
         return Registry.register(BuiltInRegistries.SOUND_EVENT, id,
                 SoundEvent.createVariableRangeEvent(id));
     }

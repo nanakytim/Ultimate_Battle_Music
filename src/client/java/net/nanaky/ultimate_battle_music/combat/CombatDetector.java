@@ -1,4 +1,4 @@
-package net.nanaky.battle_music.combat;
+package net.nanaky.ultimate_battle_music.combat;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -21,9 +21,10 @@ import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraft.world.entity.monster.warden.Warden;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.nanaky.battle_music.config.BattleMusicConfig;
-import net.nanaky.battle_music.config.ConfigManager;
-import net.nanaky.battle_music.music.MusicManager;
+import net.nanaky.ultimate_battle_music.combat.CombatState;
+import net.nanaky.ultimate_battle_music.config.BattleMusicConfig;
+import net.nanaky.ultimate_battle_music.config.ConfigManager;
+import net.nanaky.ultimate_battle_music.music.MusicManager;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -42,7 +43,7 @@ public class CombatDetector {
 
     private static TagKey<EntityType<?>> tag(String path) {
         return TagKey.create(Registries.ENTITY_TYPE,
-                Identifier.fromNamespaceAndPath("battle_music", path));
+                Identifier.fromNamespaceAndPath("ultimate_battle_music", path));
     }
 
     private static boolean isRaidActive(Minecraft mc) {

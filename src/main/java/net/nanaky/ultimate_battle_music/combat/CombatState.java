@@ -1,4 +1,4 @@
-package net.nanaky.battle_music.combat;
+package net.nanaky.ultimate_battle_music.combat;
 
 public enum CombatState {
     NONE(0),

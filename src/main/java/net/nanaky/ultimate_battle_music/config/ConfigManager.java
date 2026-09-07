@@ -1,9 +1,9 @@
-package net.nanaky.battle_music.config;
+package net.nanaky.ultimate_battle_music.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
-import net.nanaky.battle_music.BattleMusicMod;
+import net.nanaky.ultimate_battle_music.UltimateBattleMusicMod;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -11,7 +11,7 @@ import java.nio.file.Path;
 public class ConfigManager {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH =
-            FabricLoader.getInstance().getConfigDir().resolve("battle_music.json");
+            FabricLoader.getInstance().getConfigDir().resolve("ultimate_battle_music.json");
 
     public static BattleMusicConfig INSTANCE = new BattleMusicConfig();
 
@@ -49,7 +49,7 @@ public class ConfigManager {
                 INSTANCE.ghostDurationTicks     = loaded.ghostDurationTicks;
             }
         } catch (Exception e) {
-            BattleMusicMod.LOGGER.error("[BattleMusic] Failed to load config: {}", e.toString());
+            UltimateBattleMusicMod.LOGGER.error("[BattleMusic] Failed to load config: {}", e.toString());
         }
     }
 
@@ -57,7 +57,7 @@ public class ConfigManager {
         try (Writer w = new FileWriter(CONFIG_PATH.toFile())) {
             GSON.toJson(INSTANCE, w);
         } catch (Exception e) {
-            BattleMusicMod.LOGGER.error("[BattleMusic] Failed to save config: {}", e.toString());
+            UltimateBattleMusicMod.LOGGER.error("[BattleMusic] Failed to save config: {}", e.toString());
         }
     }
 

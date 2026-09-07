@@ -1,12 +1,12 @@
-package net.nanaky.battle_music;
+package net.nanaky.ultimate_battle_music;
 
-import net.nanaky.battle_music.combat.CombatDetector;
-import net.nanaky.battle_music.music.MusicManager;
+import net.nanaky.ultimate_battle_music.combat.CombatDetector;
+import net.nanaky.ultimate_battle_music.music.MusicManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 
-public class BattleMusicClient implements ClientModInitializer {
+public class UltimateBattleMusicClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

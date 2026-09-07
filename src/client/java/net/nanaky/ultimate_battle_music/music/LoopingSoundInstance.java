@@ -1,4 +1,4 @@
-package net.nanaky.battle_music.music;
+package net.nanaky.ultimate_battle_music.music;
 
 import net.minecraft.client.resources.sounds.AbstractSoundInstance;
 import net.minecraft.client.resources.sounds.TickableSoundInstance;
