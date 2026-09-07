@@ -7,6 +7,7 @@ import net.nanaky.ultimate_battle_music.config.ConfigManager;
 import net.nanaky.ultimate_battle_music.registry.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.AABB;
 
 import java.util.*;
@@ -31,6 +32,7 @@ public class MusicManager {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
             BattleMusicConfig cfg = ConfigManager.getInstance();
+            updateJukeboxGhosting(cfg);
             boolean inFluid       = mc.player.isUnderWater()
                                  || mc.player.isEyeInFluid(net.minecraft.tags.FluidTags.LAVA);
 
@@ -51,6 +53,53 @@ public class MusicManager {
                 }
             }
         }
+    }
+
+    private static void updateJukeboxGhosting(BattleMusicConfig cfg) {
+        boolean jukebox = isJukeboxPlaying(Minecraft.getInstance());
+        boolean useFade = cfg.isUseFade();
+
+        if (jukebox) {
+            for (LoopingSoundInstance sound : managedSounds.values()) {
+                LoopingSoundInstance.Phase phase = sound.getPhase();
+                if (phase == LoopingSoundInstance.Phase.SUSTAIN || phase == LoopingSoundInstance.Phase.FADE_IN) {
+                    sound.beginFadeOut(useFade);
+                }
+            }
+        } else {
+            for (Map.Entry<CombatState, LoopingSoundInstance> entry : managedSounds.entrySet()) {
+                if (!activeStates.contains(entry.getKey())) continue;
+
+                LoopingSoundInstance sound = entry.getValue();
+                if (!sound.isRevivable()) continue;
+
+                boolean willBeAudible = entry.getKey() == currentAudibleState;
+                sound.revive(useFade && willBeAudible);
+                if (willBeAudible) sound.activate(useFade);
+                else               sound.suppress(false);
+            }
+        }
+    }
+
+    private static boolean isJukeboxPlaying(Minecraft mc) {
+        try {
+            var field = mc.getSoundManager().getClass().getDeclaredField("soundEngine");
+            field.setAccessible(true);
+            Object engine = field.get(mc.getSoundManager());
+            var instancesField = engine.getClass().getDeclaredField("instanceToChannel");
+            instancesField.setAccessible(true);
+            @SuppressWarnings("unchecked")
+            java.util.Map<net.minecraft.client.resources.sounds.SoundInstance, ?> map =
+                    (java.util.Map<net.minecraft.client.resources.sounds.SoundInstance, ?>) instancesField.get(engine);
+            for (net.minecraft.client.resources.sounds.SoundInstance s : map.keySet()) {
+                if (s.getSource() == SoundSource.RECORDS
+                        && s.getVolume() > 0.01f
+                        && s.getIdentifier().getPath().startsWith("music_disc.")) {
+                    return true;
+                }
+            }
+        } catch (Exception ignored) {}
+        return false;
     }
 
     public static void onConfigChanged() {
