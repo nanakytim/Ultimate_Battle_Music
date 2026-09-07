@@ -20,6 +20,8 @@ public class MusicManager {
     private static boolean wasInFluid          = false;
     private static final int FLUID_PITCH_DELAY = 50;
 
+    public static volatile boolean audible = false;
+
     public static void tick() {
         managedSounds.entrySet().removeIf(e -> e.getValue().isStopped());
 
@@ -135,6 +137,11 @@ public class MusicManager {
         if (!activeStates.isEmpty()) {
             Minecraft.getInstance().getMusicManager().stopPlaying();
         }
+
+        audible = currentAudibleState != CombatState.NONE;
+        if (audible) {
+            Minecraft.getInstance().getMusicManager().stopPlaying();
+        }
     }
 
     public static void stopAll() {
@@ -142,6 +149,7 @@ public class MusicManager {
         managedSounds.clear();
         activeStates        = EnumSet.noneOf(CombatState.class);
         currentAudibleState = CombatState.NONE;
+        audible = false;
     }
 
     private static CombatState resolveAudibleState(Set<CombatState> states, BattleMusicConfig cfg) {
