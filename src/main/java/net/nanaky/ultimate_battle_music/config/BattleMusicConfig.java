@@ -22,6 +22,7 @@ public class BattleMusicConfig {
     public double banditRadius  = 32.0;
     public double creeperRadius = 3.0;
     public boolean enableMusic  = true;
+<<<<<<< HEAD
     public MusicMode variantMode = MusicMode.ON;
     public MusicMode banditMode  = MusicMode.ON;
     public MusicMode netherMode  = MusicMode.ON;
@@ -32,6 +33,24 @@ public class BattleMusicConfig {
     public float netherVolume    = 0.5f;
     public float raidVolume      = 0.5f;
     public float bossVolume      = 0.5f;
+=======
+    public MusicMode variantMode  = MusicMode.ON;
+    public MusicMode illagerMode  = MusicMode.ON;
+    public MusicMode netherMode   = MusicMode.ON;
+    public MusicMode raidMode     = MusicMode.ON;
+    public MusicMode invokerMode  = MusicMode.ON;
+    public MusicMode wardenMode   = MusicMode.ON;
+    public MusicMode witherMode   = MusicMode.ON;
+    public MusicMode dragonMode   = MusicMode.ON;
+    public float defaultVolume   = 0.5f;
+    public float illagerVolume   = 0.5f;
+    public float netherVolume    = 0.5f;
+    public float raidVolume      = 0.5f;
+    public float invokerVolume   = 0.5f;
+    public float wardenVolume    = 0.5f;
+    public float witherVolume    = 0.5f;
+    public float dragonVolume    = 0.5f;
+>>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
     public float underwaterPitch = 0.75f;
     public boolean useFade            = true;
     public int     fadeOutTicks       = 20;
@@ -73,12 +92,26 @@ public class BattleMusicConfig {
     public MusicMode getBanditMode()          { return banditMode  != null ? banditMode  : MusicMode.ON; }
     public MusicMode getNetherMode()          { return netherMode  != null ? netherMode  : MusicMode.ON; }
     public MusicMode getRaidMode()            { return raidMode    != null ? raidMode    : MusicMode.ON; }
+<<<<<<< HEAD
     public MusicMode getBossMode()            { return bossMode    != null ? bossMode    : MusicMode.ON; }
+=======
+    public MusicMode getInvokerMode()         { return invokerMode  != null ? invokerMode  : MusicMode.ON; }
+    public MusicMode getWardenMode()          { return wardenMode  != null ? wardenMode  : MusicMode.ON; }
+    public MusicMode getWitherMode()          { return witherMode  != null ? witherMode  : MusicMode.ON; }
+    public MusicMode getDragonMode()          { return dragonMode  != null ? dragonMode  : MusicMode.ON; }
+>>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
     public float   getDefaultVolume()         { return defaultVolume; }
     public float   getBanditVolume()          { return banditVolume; }
     public float   getNetherVolume()          { return netherVolume; }
     public float   getRaidVolume()            { return raidVolume; }
+<<<<<<< HEAD
     public float   getBossVolume()            { return bossVolume; }
+=======
+    public float   getInvokerVolume()         { return invokerVolume; }
+    public float   getWardenVolume()          { return wardenVolume; }
+    public float   getWitherVolume()          { return witherVolume; }
+    public float   getDragonVolume()          { return dragonVolume; }
+>>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
     public float   getUnderwaterPitch()       { return underwaterPitch; }
     public boolean isUseFade()                { return useFade; }
     public int     getFadeOutTicks()          { return fadeOutTicks; }

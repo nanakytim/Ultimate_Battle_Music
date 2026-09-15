@@ -6,6 +6,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
@@ -38,8 +39,14 @@ public class CombatDetector {
     private static final TagKey<EntityType<?>> TAG_NORMAL  = tag("normal_hostiles");
     private static final TagKey<EntityType<?>> TAG_FAR     = tag("long_range");
     private static final TagKey<EntityType<?>> TAG_VARIANT = tag("variants");
+<<<<<<< HEAD
     private static final TagKey<EntityType<?>> TAG_BANDIT  = tag("bandits");
     private static final TagKey<EntityType<?>> TAG_BOSS    = tag("bosses");
+=======
+    private static final TagKey<EntityType<?>> TAG_BANDIT  = tag("illagers");
+    private static final TagKey<EntityType<?>> TAG_INVOKER = tag("invoker");
+    public static boolean isVariantPublic(Mob mob) { return isVariant(mob); }
+>>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
 
     private static TagKey<EntityType<?>> tag(String path) {
         return TagKey.create(Registries.ENTITY_TYPE,
@@ -106,6 +113,9 @@ public class CombatDetector {
         if (hasThreat(player, level, cfg.getBossRadius(), false, CombatDetector::isBoss))
             states.add(CombatState.BOSS);
 
+        if (hasThreat(player, level, cfg.getBossRadius(), false, CombatDetector::isInvoker))
+            states.add(CombatState.INVOKER);
+
         if (isRaidActive(mc))
             states.add(CombatState.RAID);
 
@@ -135,6 +145,10 @@ public class CombatDetector {
         return states;
     }
 
+    private static boolean isInvoker(Mob mob) {
+        return mob.getType().builtInRegistryHolder().is(TAG_INVOKER);
+    }
+
     private static boolean hasThreat(LocalPlayer player, Level level, double radius,
                                      boolean requireTargeting, Predicate<Mob> filter) {
         if (radius <= 0) return false;
@@ -160,9 +174,10 @@ public class CombatDetector {
 
     private static boolean isBandit(Mob mob) {
         if (mob.getType().builtInRegistryHolder().is(TAG_BANDIT)) return true;
+        if (mob.getType().builtInRegistryHolder().is(EntityTypeTags.ILLAGER)) return true;
         return mob instanceof Pillager || mob instanceof Vindicator || mob instanceof Ravager
                 || mob instanceof Evoker || mob instanceof Vex || mob instanceof Illusioner;
-    }
+}
 
     private static boolean isVariant(Mob mob) {
         if (mob.getType().builtInRegistryHolder().is(TAG_VARIANT)) return true;

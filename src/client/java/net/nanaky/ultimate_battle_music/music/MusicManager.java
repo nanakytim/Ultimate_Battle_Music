@@ -204,7 +204,14 @@ public class MusicManager {
     private static CombatState resolveAudibleState(Set<CombatState> states, BattleMusicConfig cfg) {
         if (states.isEmpty()) return CombatState.NONE;
 
+<<<<<<< HEAD
         if (states.contains(CombatState.BOSS))             return CombatState.BOSS;
+=======
+        if (states.contains(CombatState.ENDER_DRAGON))     return CombatState.ENDER_DRAGON;
+        if (states.contains(CombatState.WITHER))           return CombatState.WITHER;
+        if (states.contains(CombatState.WARDEN))           return CombatState.WARDEN;
+        if (states.contains(CombatState.INVOKER))          return CombatState.INVOKER;
+>>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
         if (states.contains(CombatState.RAID))             return CombatState.RAID;
         if (states.contains(CombatState.OVERWORLD_BANDIT)) return CombatState.OVERWORLD_BANDIT;
         if (states.contains(CombatState.NETHER))           return CombatState.NETHER;
@@ -243,8 +250,18 @@ public class MusicManager {
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
                 case OFF    -> null;
             };
+<<<<<<< HEAD
             case RAID -> switch (cfg.getBossMode()) {
                 case ON     -> ModSounds.BATTLE_BOSS;
+=======
+            case INVOKER -> switch (cfg.getInvokerMode()) {
+                case ON       -> ModSounds.BATTLE_INVOKER;
+                case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                case OFF      -> null;
+            };
+            case WARDEN -> switch (cfg.getWardenMode()) {
+                case ON       -> ModSounds.BATTLE_WARDEN;
+>>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
                 case OFF    -> null;
             };
@@ -255,7 +272,14 @@ public class MusicManager {
 
     private static float resolveVolume(CombatState state, BattleMusicConfig cfg) {
         return switch (state) {
+<<<<<<< HEAD
             case BOSS             -> cfg.getBossVolume();
+=======
+            case ENDER_DRAGON     -> cfg.getDragonVolume();
+            case WITHER           -> cfg.getWitherVolume();
+            case WARDEN           -> cfg.getWardenVolume();
+            case INVOKER          -> cfg.getInvokerVolume();
+>>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
             case RAID             -> cfg.getRaidVolume();
             case NETHER           -> cfg.getNetherVolume();
             case OVERWORLD_BANDIT -> cfg.getBanditVolume();

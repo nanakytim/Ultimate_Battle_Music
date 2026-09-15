@@ -29,6 +29,7 @@ public class ConfigManager {
                 INSTANCE.normalRadius           = loaded.normalRadius;
                 INSTANCE.farRadius              = loaded.farRadius;
                 INSTANCE.variantRadius          = loaded.variantRadius;
+<<<<<<< HEAD
                 INSTANCE.banditRadius           = loaded.banditRadius;
                 INSTANCE.creeperRadius          = loaded.creeperRadius;
                 INSTANCE.enableMusic            = loaded.enableMusic;
@@ -42,6 +43,27 @@ public class ConfigManager {
                 INSTANCE.netherVolume           = loaded.netherVolume;
                 INSTANCE.raidVolume             = loaded.raidVolume;
                 INSTANCE.bossVolume             = loaded.bossVolume;
+=======
+                INSTANCE.illagerRadius          = loaded.illagerRadius;
+                INSTANCE.creeperRadius          = loaded.creeperRadius;
+                INSTANCE.enableMusic            = loaded.enableMusic;
+                INSTANCE.variantMode            = loaded.variantMode;
+                INSTANCE.illagerMode            = loaded.illagerMode;
+                INSTANCE.netherMode             = loaded.netherMode;
+                INSTANCE.raidMode               = loaded.raidMode;
+                INSTANCE.invokerMode            = loaded.invokerMode;
+                INSTANCE.wardenMode             = loaded.wardenMode;
+                INSTANCE.witherMode             = loaded.witherMode;
+                INSTANCE.dragonMode             = loaded.dragonMode;
+                INSTANCE.defaultVolume          = loaded.defaultVolume;
+                INSTANCE.illagerVolume          = loaded.illagerVolume;
+                INSTANCE.netherVolume           = loaded.netherVolume;
+                INSTANCE.raidVolume             = loaded.raidVolume;
+                INSTANCE.invokerVolume          = loaded.invokerVolume;
+                INSTANCE.wardenVolume           = loaded.wardenVolume;
+                INSTANCE.witherVolume           = loaded.witherVolume;
+                INSTANCE.dragonVolume           = loaded.dragonVolume;
+>>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
                 INSTANCE.underwaterPitch        = loaded.underwaterPitch;
                 INSTANCE.useFade                = loaded.useFade;
                 INSTANCE.fadeOutTicks           = loaded.fadeOutTicks;
