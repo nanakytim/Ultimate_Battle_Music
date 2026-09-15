@@ -12,6 +12,7 @@ public class ModSounds {
     public static SoundEvent BATTLE_BANDITS;
     public static SoundEvent BATTLE_NETHER;
     public static SoundEvent BATTLE_RAID;
+    public static SoundEvent BATTLE_INVOKER;
     public static SoundEvent BATTLE_WARDEN;
     public static SoundEvent BATTLE_WITHER;
     public static SoundEvent BATTLE_DRAGON;
@@ -22,6 +23,7 @@ public class ModSounds {
         BATTLE_BANDITS = reg("battle_illager");
         BATTLE_NETHER  = reg("battle_nether");
         BATTLE_RAID    = reg("battle_raid");
+        BATTLE_INVOKER = reg("battle_invoker");
         BATTLE_WARDEN  = reg("battle_warden");
         BATTLE_WITHER  = reg("battle_wither");
         BATTLE_DRAGON  = reg("battle_dragon");

@@ -196,6 +196,7 @@ public class MusicManager {
         if (states.contains(CombatState.ENDER_DRAGON))     return CombatState.ENDER_DRAGON;
         if (states.contains(CombatState.WITHER))           return CombatState.WITHER;
         if (states.contains(CombatState.WARDEN))           return CombatState.WARDEN;
+        if (states.contains(CombatState.INVOKER))          return CombatState.INVOKER;
         if (states.contains(CombatState.RAID))             return CombatState.RAID;
         if (states.contains(CombatState.BANDIT))           return CombatState.BANDIT;
         if (states.contains(CombatState.NETHER))           return CombatState.NETHER;
@@ -217,6 +218,11 @@ public class MusicManager {
             };
             case RAID -> switch (cfg.getRaidMode()) {
                 case ON       -> ModSounds.BATTLE_RAID;
+                case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                case OFF      -> null;
+            };
+            case INVOKER -> switch (cfg.getInvokerMode()) {
+                case ON       -> ModSounds.BATTLE_INVOKER;
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
                 case OFF      -> null;
             };
@@ -261,6 +267,7 @@ public class MusicManager {
             case ENDER_DRAGON     -> cfg.getDragonVolume();
             case WITHER           -> cfg.getWitherVolume();
             case WARDEN           -> cfg.getWardenVolume();
+            case INVOKER          -> cfg.getInvokerVolume();
             case RAID             -> cfg.getRaidVolume();
             case NETHER           -> cfg.getNetherVolume();
             case BANDIT -> cfg.getBanditVolume();

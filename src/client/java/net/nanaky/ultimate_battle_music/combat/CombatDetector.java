@@ -6,6 +6,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
@@ -40,6 +41,7 @@ public class CombatDetector {
     private static final TagKey<EntityType<?>> TAG_FAR     = tag("long_range");
     private static final TagKey<EntityType<?>> TAG_VARIANT = tag("variants");
     private static final TagKey<EntityType<?>> TAG_BANDIT  = tag("illagers");
+    private static final TagKey<EntityType<?>> TAG_INVOKER = tag("invoker");
     public static boolean isVariantPublic(Mob mob) { return isVariant(mob); }
 
     private static TagKey<EntityType<?>> tag(String path) {
@@ -123,6 +125,9 @@ public class CombatDetector {
         if (hasThreat(player, level, cfg.getBossRadius(), false, mob -> mob instanceof Warden))
             states.add(CombatState.WARDEN);
 
+        if (hasThreat(player, level, cfg.getBossRadius(), false, CombatDetector::isInvoker))
+            states.add(CombatState.INVOKER);
+
         if (isRaidActive(mc))
             states.add(CombatState.RAID);
 
@@ -142,6 +147,10 @@ public class CombatDetector {
         }
 
         return states;
+    }
+
+    private static boolean isInvoker(Mob mob) {
+        return mob.getType().builtInRegistryHolder().is(TAG_INVOKER);
     }
 
     private static boolean hasThreat(LocalPlayer player, Level level, double radius,
@@ -164,9 +173,10 @@ public class CombatDetector {
 
     private static boolean isBandit(Mob mob) {
         if (mob.getType().builtInRegistryHolder().is(TAG_BANDIT)) return true;
+        if (mob.getType().builtInRegistryHolder().is(EntityTypeTags.ILLAGER)) return true;
         return mob instanceof Pillager || mob instanceof Vindicator || mob instanceof Ravager
                 || mob instanceof Evoker || mob instanceof Vex || mob instanceof Illusioner;
-    }
+}
 
     private static boolean isVariant(Mob mob) {
         if (mob.getType().builtInRegistryHolder().is(TAG_VARIANT)) return true;
