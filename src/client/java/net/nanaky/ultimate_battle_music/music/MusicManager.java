@@ -1,5 +1,6 @@
 package net.nanaky.ultimate_battle_music.music;
 
+import net.nanaky.ultimate_battle_music.combat.CombatDetector;
 import net.nanaky.ultimate_battle_music.combat.CombatState;
 import net.nanaky.ultimate_battle_music.config.BattleMusicConfig;
 import net.nanaky.ultimate_battle_music.config.ConfigManager;
@@ -7,6 +8,7 @@ import net.nanaky.ultimate_battle_music.registry.ModSounds;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.phys.AABB;
 
 import java.util.*;
 
@@ -17,6 +19,7 @@ public class MusicManager {
 
     private static Set<CombatState> activeStates = EnumSet.noneOf(CombatState.class);
     private static CombatState currentAudibleState = CombatState.NONE;
+
     private static int     fluidPitchDelayTick = 0;
     private static boolean wasInFluid          = false;
     private static final int FLUID_PITCH_DELAY = 50;
@@ -133,17 +136,7 @@ public class MusicManager {
         for (CombatState state : removed) {
             LoopingSoundInstance sound = managedSounds.get(state);
             if (sound == null) continue;
-
-            boolean isPeer = (state == CombatState.OVERWORLD_NORMAL || state == CombatState.OVERWORLD_VARIANT);
-            boolean peerTakesOver = isPeer && (
-                newStates.contains(CombatState.OVERWORLD_NORMAL) ||
-                newStates.contains(CombatState.OVERWORLD_VARIANT));
-
-            if (peerTakesOver) {
-                sound.suppress(false);
-            } else {
-                sound.beginFadeOut(useFade);
-            }
+            sound.beginFadeOut(useFade);
         }
 
         for (CombatState state : added) {
@@ -183,10 +176,6 @@ public class MusicManager {
             }
         }
 
-        if (!activeStates.isEmpty()) {
-            Minecraft.getInstance().getMusicManager().stopPlaying();
-        }
-
         audible = currentAudibleState != CombatState.NONE;
         if (audible) {
             Minecraft.getInstance().getMusicManager().stopPlaying();
@@ -204,56 +193,34 @@ public class MusicManager {
     private static CombatState resolveAudibleState(Set<CombatState> states, BattleMusicConfig cfg) {
         if (states.isEmpty()) return CombatState.NONE;
 
-<<<<<<< HEAD
-        if (states.contains(CombatState.BOSS))             return CombatState.BOSS;
-=======
         if (states.contains(CombatState.ENDER_DRAGON))     return CombatState.ENDER_DRAGON;
         if (states.contains(CombatState.WITHER))           return CombatState.WITHER;
         if (states.contains(CombatState.WARDEN))           return CombatState.WARDEN;
         if (states.contains(CombatState.INVOKER))          return CombatState.INVOKER;
->>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
         if (states.contains(CombatState.RAID))             return CombatState.RAID;
-        if (states.contains(CombatState.OVERWORLD_BANDIT)) return CombatState.OVERWORLD_BANDIT;
+        if (states.contains(CombatState.BANDIT))           return CombatState.BANDIT;
         if (states.contains(CombatState.NETHER))           return CombatState.NETHER;
-
-        boolean hasVariant = states.contains(CombatState.OVERWORLD_VARIANT);
-        boolean hasNormal  = states.contains(CombatState.OVERWORLD_NORMAL);
-
-        if (hasVariant || hasNormal) {
-            if (currentAudibleState == CombatState.OVERWORLD_VARIANT && hasVariant) return CombatState.OVERWORLD_VARIANT;
-            if (currentAudibleState == CombatState.OVERWORLD_NORMAL  && hasNormal)  return CombatState.OVERWORLD_NORMAL;
-            return hasVariant ? CombatState.OVERWORLD_VARIANT : CombatState.OVERWORLD_NORMAL;
-        }
-
-        return CombatState.NONE;
+        if (states.contains(CombatState.OVERWORLD))        return CombatState.OVERWORLD;
+        return CombatState.NONE;   
     }
 
     private static SoundEvent resolveSound(CombatState state, BattleMusicConfig cfg) {
         return switch (state) {
-            case OVERWORLD_VARIANT -> switch (cfg.getVariantMode()) {
-                case ON     -> ModSounds.BATTLE_VARIANT;
+            case BANDIT -> switch (cfg.getBanditMode()) {
+                case ON       -> ModSounds.BATTLE_BANDITS;
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
-                case OFF    -> null;
-            };
-            case OVERWORLD_BANDIT -> switch (cfg.getBanditMode()) {
-                case ON     -> ModSounds.BATTLE_BANDITS;
-                case FALLBACK -> ModSounds.BATTLE_MUSIC;
-                case OFF    -> null;
+                case OFF      -> null;
             };
             case NETHER -> switch (cfg.getNetherMode()) {
-                case ON     -> ModSounds.BATTLE_NETHER;
+                case ON       -> ModSounds.BATTLE_NETHER;
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
-                case OFF    -> null;
+                case OFF      -> null;
             };
-            case BOSS -> switch (cfg.getRaidMode()) {
-                case ON     -> ModSounds.BATTLE_RAID;
+            case RAID -> switch (cfg.getRaidMode()) {
+                case ON       -> ModSounds.BATTLE_RAID;
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
-                case OFF    -> null;
+                case OFF      -> null;
             };
-<<<<<<< HEAD
-            case RAID -> switch (cfg.getBossMode()) {
-                case ON     -> ModSounds.BATTLE_BOSS;
-=======
             case INVOKER -> switch (cfg.getInvokerMode()) {
                 case ON       -> ModSounds.BATTLE_INVOKER;
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
@@ -261,28 +228,49 @@ public class MusicManager {
             };
             case WARDEN -> switch (cfg.getWardenMode()) {
                 case ON       -> ModSounds.BATTLE_WARDEN;
->>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
                 case FALLBACK -> ModSounds.BATTLE_MUSIC;
-                case OFF    -> null;
+                case OFF      -> null;
             };
-            case OVERWORLD_NORMAL -> ModSounds.BATTLE_MUSIC;
-            default               -> null;
+            case WITHER -> switch (cfg.getWitherMode()) {
+                case ON       -> ModSounds.BATTLE_WITHER;
+                case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                case OFF      -> null;
+            };
+            case ENDER_DRAGON -> switch (cfg.getDragonMode()) {
+                case ON       -> ModSounds.BATTLE_DRAGON;
+                case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                case OFF      -> null;
+            };
+            case OVERWORLD -> {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null && mc.level != null) {
+                BattleMusicConfig c = ConfigManager.getInstance();
+                AABB box = mc.player.getBoundingBox().inflate(c.getVariantRadius());
+                boolean hasVariant = !mc.level.getEntitiesOfClass(
+                    net.minecraft.world.entity.Mob.class, box,
+                    mob -> !mob.isDeadOrDying() && !mob.hasCustomName() && CombatDetector.isVariantPublic(mob)
+                ).isEmpty();
+                if (hasVariant) yield switch (cfg.getVariantMode()) {
+                    case ON       -> ModSounds.BATTLE_VARIANT;
+                    case FALLBACK -> ModSounds.BATTLE_MUSIC;
+                    case OFF      -> ModSounds.BATTLE_MUSIC;
+                };
+            }
+            yield ModSounds.BATTLE_MUSIC;
+            }
+            case NONE -> null;
         };
     }
 
     private static float resolveVolume(CombatState state, BattleMusicConfig cfg) {
         return switch (state) {
-<<<<<<< HEAD
-            case BOSS             -> cfg.getBossVolume();
-=======
             case ENDER_DRAGON     -> cfg.getDragonVolume();
             case WITHER           -> cfg.getWitherVolume();
             case WARDEN           -> cfg.getWardenVolume();
             case INVOKER          -> cfg.getInvokerVolume();
->>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
             case RAID             -> cfg.getRaidVolume();
             case NETHER           -> cfg.getNetherVolume();
-            case OVERWORLD_BANDIT -> cfg.getBanditVolume();
+            case BANDIT -> cfg.getBanditVolume();
             default               -> cfg.getDefaultVolume();
         };
     }

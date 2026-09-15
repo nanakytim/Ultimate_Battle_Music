@@ -17,6 +17,8 @@ import net.minecraft.world.entity.monster.spider.*;
 import net.minecraft.world.entity.monster.illager.*;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.breeze.Breeze;
+import net.minecraft.world.entity.monster.MagmaCube;
+import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraft.world.entity.monster.warden.Warden;
@@ -39,14 +41,9 @@ public class CombatDetector {
     private static final TagKey<EntityType<?>> TAG_NORMAL  = tag("normal_hostiles");
     private static final TagKey<EntityType<?>> TAG_FAR     = tag("long_range");
     private static final TagKey<EntityType<?>> TAG_VARIANT = tag("variants");
-<<<<<<< HEAD
-    private static final TagKey<EntityType<?>> TAG_BANDIT  = tag("bandits");
-    private static final TagKey<EntityType<?>> TAG_BOSS    = tag("bosses");
-=======
     private static final TagKey<EntityType<?>> TAG_BANDIT  = tag("illagers");
     private static final TagKey<EntityType<?>> TAG_INVOKER = tag("invoker");
     public static boolean isVariantPublic(Mob mob) { return isVariant(mob); }
->>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
 
     private static TagKey<EntityType<?>> tag(String path) {
         return TagKey.create(Registries.ENTITY_TYPE,
@@ -110,8 +107,14 @@ public class CombatDetector {
         LocalPlayer player      = mc.player;
         boolean     reqTarget   = cfg.isRequireTargetingPlayer();
 
-        if (hasThreat(player, level, cfg.getBossRadius(), false, CombatDetector::isBoss))
-            states.add(CombatState.BOSS);
+        if (hasThreat(player, level, cfg.getBossRadius(), false, mob -> mob instanceof EnderDragon))
+            states.add(CombatState.ENDER_DRAGON);
+
+        if (hasThreat(player, level, cfg.getBossRadius(), false, mob -> mob instanceof WitherBoss))
+            states.add(CombatState.WITHER);
+
+        if (hasThreat(player, level, cfg.getBossRadius(), false, mob -> mob instanceof Warden))
+            states.add(CombatState.WARDEN);
 
         if (hasThreat(player, level, cfg.getBossRadius(), false, CombatDetector::isInvoker))
             states.add(CombatState.INVOKER);
@@ -119,28 +122,20 @@ public class CombatDetector {
         if (isRaidActive(mc))
             states.add(CombatState.RAID);
 
-        if (level.dimension().equals(Level.NETHER)) {
-            if (hasThreat(player, level, cfg.getBanditRadius(), reqTarget, CombatDetector::isBandit)
-                || hasThreat(player, level, cfg.getVariantRadius(), reqTarget, CombatDetector::isVariant)
-                || hasThreat(player, level, cfg.getNormalRadius(), reqTarget, CombatDetector::isNormal)
-                || hasThreat(player, level, cfg.getFarRadius(), false, CombatDetector::isFar)
-                || hasThreat(player, level, cfg.getCreeperRadius(), reqTarget, mob -> mob instanceof Creeper))
-                states.add(CombatState.NETHER);
-            return states;
-        }
-
-        if (!level.dimension().equals(Level.OVERWORLD)) return states;
-
         if (hasThreat(player, level, cfg.getBanditRadius(), reqTarget, CombatDetector::isBandit))
-            states.add(CombatState.OVERWORLD_BANDIT);
+            states.add(CombatState.BANDIT);
 
-        if (hasThreat(player, level, cfg.getVariantRadius(), reqTarget, CombatDetector::isVariant))
-            states.add(CombatState.OVERWORLD_VARIANT);
-
-        if (hasThreat(player, level, cfg.getNormalRadius(), reqTarget, CombatDetector::isNormal)
+        if (hasThreat(player, level, cfg.getVariantRadius(), reqTarget, CombatDetector::isVariant)
+            || hasThreat(player, level, cfg.getNormalRadius(), reqTarget, CombatDetector::isNormal)
             || hasThreat(player, level, cfg.getFarRadius(), false, CombatDetector::isFar)
-            || hasThreat(player, level, cfg.getCreeperRadius(), reqTarget, mob -> mob instanceof Creeper))
-            states.add(CombatState.OVERWORLD_NORMAL);
+            || hasThreat(player, level, cfg.getCreeperRadius(), reqTarget, mob -> mob instanceof Creeper)) {
+            
+            if (level.dimension().equals(Level.NETHER))
+                states.add(CombatState.NETHER);
+            else {
+                states.add(CombatState.OVERWORLD);
+            }
+        }
 
         return states;
     }
@@ -154,7 +149,7 @@ public class CombatDetector {
         if (radius <= 0) return false;
         AABB box = player.getBoundingBox().inflate(radius);
         List<Mob> mobs = level.getEntitiesOfClass(Mob.class, box,
-                mob -> !mob.isDeadOrDying() && filter.test(mob));
+                mob -> !mob.isDeadOrDying() && !mob.hasCustomName() && filter.test(mob));
         if (mobs.isEmpty()) return false;
         return !requireTargeting || mobs.stream().anyMatch(CombatDetector::isThreateningPlayer);
     }
@@ -164,12 +159,7 @@ public class CombatDetector {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return false;
         if (mc.player.equals(mob.getTarget())) return true;
-        return isFar(mob) || isBandit(mob);
-    }
-
-    private static boolean isBoss(Mob mob) {
-        if (mob.getType().builtInRegistryHolder().is(TAG_BOSS)) return true;
-        return mob instanceof WitherBoss || mob instanceof EnderDragon || mob instanceof Warden;
+        return isFar(mob) || isBandit(mob) || mob instanceof Slime;
     }
 
     private static boolean isBandit(Mob mob) {
@@ -194,7 +184,8 @@ public class CombatDetector {
 
     private static boolean isNormal(Mob mob) {
         if (mob.getType().builtInRegistryHolder().is(TAG_NORMAL)) return true;
-        if (isBoss(mob) || isBandit(mob) || isVariant(mob) || isFar(mob)) return false;
+        if (mob instanceof EnderDragon || mob instanceof WitherBoss || mob instanceof Warden
+                || isBandit(mob) || isVariant(mob) || isFar(mob)) return false;
         return mob instanceof Zombie || mob instanceof Drowned
                 || mob instanceof WitherSkeleton || mob instanceof Skeleton
                 || mob instanceof Spider || mob instanceof MagmaCube

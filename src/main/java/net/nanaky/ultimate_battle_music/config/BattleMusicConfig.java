@@ -1,9 +1,9 @@
 package net.nanaky.ultimate_battle_music.config;
 
-import net.nanaky.ultimate_battle_music.UltimateBattleMusicMod;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import net.nanaky.ultimate_battle_music.UltimateBattleMusicMod;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,21 +19,9 @@ public class BattleMusicConfig {
     public double normalRadius  = 16.0;
     public double farRadius     = 32.0;
     public double variantRadius = 16.0;
-    public double banditRadius  = 32.0;
+    public double illagerRadius  = 16.0;
     public double creeperRadius = 3.0;
     public boolean enableMusic  = true;
-<<<<<<< HEAD
-    public MusicMode variantMode = MusicMode.ON;
-    public MusicMode banditMode  = MusicMode.ON;
-    public MusicMode netherMode  = MusicMode.ON;
-    public MusicMode raidMode    = MusicMode.ON;
-    public MusicMode bossMode    = MusicMode.ON;
-    public float defaultVolume   = 0.5f;
-    public float banditVolume    = 0.5f;
-    public float netherVolume    = 0.5f;
-    public float raidVolume      = 0.5f;
-    public float bossVolume      = 0.5f;
-=======
     public MusicMode variantMode  = MusicMode.ON;
     public MusicMode illagerMode  = MusicMode.ON;
     public MusicMode netherMode   = MusicMode.ON;
@@ -50,7 +38,6 @@ public class BattleMusicConfig {
     public float wardenVolume    = 0.5f;
     public float witherVolume    = 0.5f;
     public float dragonVolume    = 0.5f;
->>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
     public float underwaterPitch = 0.75f;
     public boolean useFade            = true;
     public int     fadeOutTicks       = 20;
@@ -85,33 +72,25 @@ public class BattleMusicConfig {
     public double  getNormalRadius()          { return normalRadius; }
     public double  getFarRadius()             { return farRadius; }
     public double  getVariantRadius()         { return variantRadius; }
-    public double  getBanditRadius()          { return banditRadius; }
+    public double  getBanditRadius()          { return illagerRadius; }
     public double  getCreeperRadius()         { return creeperRadius; }
     public boolean isEnableMusic()            { return enableMusic; }
     public MusicMode getVariantMode()         { return variantMode != null ? variantMode : MusicMode.ON; }
-    public MusicMode getBanditMode()          { return banditMode  != null ? banditMode  : MusicMode.ON; }
+    public MusicMode getBanditMode()          { return illagerMode  != null ? illagerMode  : MusicMode.ON; }
     public MusicMode getNetherMode()          { return netherMode  != null ? netherMode  : MusicMode.ON; }
     public MusicMode getRaidMode()            { return raidMode    != null ? raidMode    : MusicMode.ON; }
-<<<<<<< HEAD
-    public MusicMode getBossMode()            { return bossMode    != null ? bossMode    : MusicMode.ON; }
-=======
     public MusicMode getInvokerMode()         { return invokerMode  != null ? invokerMode  : MusicMode.ON; }
     public MusicMode getWardenMode()          { return wardenMode  != null ? wardenMode  : MusicMode.ON; }
     public MusicMode getWitherMode()          { return witherMode  != null ? witherMode  : MusicMode.ON; }
     public MusicMode getDragonMode()          { return dragonMode  != null ? dragonMode  : MusicMode.ON; }
->>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
     public float   getDefaultVolume()         { return defaultVolume; }
-    public float   getBanditVolume()          { return banditVolume; }
+    public float   getBanditVolume()          { return illagerVolume; }
     public float   getNetherVolume()          { return netherVolume; }
     public float   getRaidVolume()            { return raidVolume; }
-<<<<<<< HEAD
-    public float   getBossVolume()            { return bossVolume; }
-=======
     public float   getInvokerVolume()         { return invokerVolume; }
     public float   getWardenVolume()          { return wardenVolume; }
     public float   getWitherVolume()          { return witherVolume; }
     public float   getDragonVolume()          { return dragonVolume; }
->>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
     public float   getUnderwaterPitch()       { return underwaterPitch; }
     public boolean isUseFade()                { return useFade; }
     public int     getFadeOutTicks()          { return fadeOutTicks; }

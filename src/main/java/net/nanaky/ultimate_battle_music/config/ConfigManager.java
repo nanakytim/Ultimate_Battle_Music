@@ -12,7 +12,6 @@ public class ConfigManager {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH =
             FabricLoader.getInstance().getConfigDir().resolve("ultimate_battle_music.json");
-
     public static BattleMusicConfig INSTANCE = new BattleMusicConfig();
 
     public static void load() {
@@ -29,21 +28,6 @@ public class ConfigManager {
                 INSTANCE.normalRadius           = loaded.normalRadius;
                 INSTANCE.farRadius              = loaded.farRadius;
                 INSTANCE.variantRadius          = loaded.variantRadius;
-<<<<<<< HEAD
-                INSTANCE.banditRadius           = loaded.banditRadius;
-                INSTANCE.creeperRadius          = loaded.creeperRadius;
-                INSTANCE.enableMusic            = loaded.enableMusic;
-                INSTANCE.variantMode            = loaded.variantMode;
-                INSTANCE.banditMode             = loaded.banditMode;
-                INSTANCE.netherMode             = loaded.netherMode;
-                INSTANCE.raidMode               = loaded.raidMode;
-                INSTANCE.bossMode               = loaded.bossMode;
-                INSTANCE.defaultVolume          = loaded.defaultVolume;
-                INSTANCE.banditVolume           = loaded.banditVolume;
-                INSTANCE.netherVolume           = loaded.netherVolume;
-                INSTANCE.raidVolume             = loaded.raidVolume;
-                INSTANCE.bossVolume             = loaded.bossVolume;
-=======
                 INSTANCE.illagerRadius          = loaded.illagerRadius;
                 INSTANCE.creeperRadius          = loaded.creeperRadius;
                 INSTANCE.enableMusic            = loaded.enableMusic;
@@ -63,7 +47,6 @@ public class ConfigManager {
                 INSTANCE.wardenVolume           = loaded.wardenVolume;
                 INSTANCE.witherVolume           = loaded.witherVolume;
                 INSTANCE.dragonVolume           = loaded.dragonVolume;
->>>>>>> d1d3ba7 (Fixed Illager tag and added Invoker boss)
                 INSTANCE.underwaterPitch        = loaded.underwaterPitch;
                 INSTANCE.useFade                = loaded.useFade;
                 INSTANCE.fadeOutTicks           = loaded.fadeOutTicks;
