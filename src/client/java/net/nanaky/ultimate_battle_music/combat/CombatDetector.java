@@ -149,8 +149,14 @@ public class CombatDetector {
         return states;
     }
 
+    private static final Set<String> INVOKER_IDS = Set.of(
+            "illagerinvasion:invoker"
+    );
+
     private static boolean isInvoker(Mob mob) {
-        return mob.getType().builtInRegistryHolder().is(TAG_INVOKER);
+        if (mob.getType().builtInRegistryHolder().is(TAG_INVOKER)) return true;
+        Identifier id = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType());
+        return id != null && INVOKER_IDS.contains(id.toString());
     }
 
     private static boolean hasThreat(LocalPlayer player, Level level, double radius,
@@ -172,6 +178,7 @@ public class CombatDetector {
     }
 
     private static boolean isBandit(Mob mob) {
+        if (isInvoker(mob)) return false;
         if (mob.getType().builtInRegistryHolder().is(TAG_BANDIT)) return true;
         if (mob.getType().builtInRegistryHolder().is(EntityTypeTags.ILLAGER)) return true;
         return mob instanceof Pillager || mob instanceof Vindicator || mob instanceof Ravager
